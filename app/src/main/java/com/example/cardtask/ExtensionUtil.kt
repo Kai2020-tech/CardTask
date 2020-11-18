@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
@@ -17,7 +18,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -143,10 +143,12 @@ fun Fragment.createMultipartBody(file: File, galleryUri: Uri?): MultipartBody.Pa
     } else {
         if (galleryUri != null) {
             imageStream = requireContext().contentResolver.openInputStream(galleryUri)
-            readImageDegree(requireContext(), galleryUri)
+            val degree = getImageDegree(requireContext(), galleryUri)
             bmp = BitmapFactory.decodeStream(imageStream)
             //將byteArrayOut進行品質壓縮 compress Quality 100->25
+            bmp = rotateBitmap(bmp, degree)
             bmp.compress(Bitmap.CompressFormat.JPEG, 25, baoS)
+
             requestFile = RequestBody.create(MediaType.parse("image/jpg"), baoS!!.toByteArray())
             Log.d("gallery", "requestFile Size ${requestFile.contentLength()}")
             MultipartBody.Part.createFormData("image", "sample.jpg", requestFile)
@@ -161,7 +163,7 @@ fun Fragment.createMultipartBody(file: File, galleryUri: Uri?): MultipartBody.Pa
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
-private fun readImageDegree(context: Context, uri: Uri){
+private fun getImageDegree(context: Context, uri: Uri): Int{
     var degree = 0
     val input = context.contentResolver.openInputStream(uri)!!
     val exifInterface = ExifInterface(input)
@@ -172,7 +174,15 @@ private fun readImageDegree(context: Context, uri: Uri){
         ExifInterface.ORIENTATION_ROTATE_180 -> degree = 180
         ExifInterface.ORIENTATION_ROTATE_270 -> degree = 270
     }
-    Log.i("image degree", "$degree")
+    return degree
+}
+
+private fun rotateBitmap(bitmap: Bitmap, degree: Int): Bitmap{
+    val w = bitmap.width
+    val h = bitmap.height
+    val matrix = Matrix()
+    matrix.postRotate(degree.toFloat())
+    return Bitmap.createBitmap(bitmap, 0, 0, w, h, matrix, true)
 }
 
 //private fun Fragment.compressPhoto(path: Uri):Bitmap {
