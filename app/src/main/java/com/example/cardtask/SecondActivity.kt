@@ -54,37 +54,40 @@ class SecondActivity : AppCompatActivity() {
         }
 
 //        if (savedInstanceState == null) {
-            Toast.makeText(this, "TOKEN = $token", Toast.LENGTH_SHORT).show()
-            Api.retrofitService.getCard(token)
-                .enqueue(object : Callback<CardResponse> {
-                    override fun onFailure(call: Call<CardResponse>, t: Throwable) {
-                        Log.e("getCard Failed", t.toString())
-                    }
-                    override fun onResponse(
-                        call: Call<CardResponse>,
-                        response: Response<CardResponse>
-                    ) {
-                        val res = response.body()
-                        if (response.isSuccessful) {
-                            userName.text = res?.userData?.username
+        Toast.makeText(this, "TOKEN = $token", Toast.LENGTH_SHORT).show()
+        Api.retrofitService.getCard(token)
+            .enqueue(object : Callback<CardResponse> {
+                override fun onFailure(call: Call<CardResponse>, t: Throwable) {
+                    Log.e("getCard Failed", t.toString())
+                }
+
+                override fun onResponse(
+                    call: Call<CardResponse>,
+                    response: Response<CardResponse>
+                ) {
+                    val res = response.body()
+                    if (response.isSuccessful) {
+                        userName.text = res?.userData?.username
+                        if (res?.userData?.image.toString() != "null") {
                             Glide.with(this@SecondActivity)
                                 .load("https://storage.googleapis.com/gcs.gill.gq/${res?.userData?.image.toString()}")
                                 .into(userImage)
+                        }
 //                        res?.userData?.showCards?.forEach { card ->
 //                            CardFragment.cardList.add(card)
 //                        }
 //                        Log.d("Success!", "getCard OK")
-                        } else {    //token失效 ,啓動MainActivity重新登入
-                            pref.delete()
-                            this@SecondActivity.finish()
-                            startActivity(Intent(this@SecondActivity, MainActivity::class.java))
-                        }
+                    } else {    //token失效 ,啓動MainActivity重新登入
+                        pref.delete()
+                        this@SecondActivity.finish()
+                        startActivity(Intent(this@SecondActivity, MainActivity::class.java))
                     }
-                })
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.frame_layout, cardFragment, "cardFragment")
-                commit()
-            }
+                }
+            })
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.frame_layout, cardFragment, "cardFragment")
+            commit()
+        }
 //        }
     }
 

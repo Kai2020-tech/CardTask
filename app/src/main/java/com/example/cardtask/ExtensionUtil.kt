@@ -79,7 +79,6 @@ fun Fragment.getPhoto(activity: FragmentActivity?): File? {
         intent.type = "image/*"
         startActivityForResult(intent, GALLERY_REQUEST_CODE)
         dialog.dismiss()
-
     }
 
     return photoFile
@@ -120,50 +119,53 @@ fun Fragment.goToEdTask(showTask: CardResponse.UserData.ShowCard.ShowTask) {
     }
 }
 
+//  相機呼叫,傳入File
 @RequiresApi(Build.VERSION_CODES.N)
-fun Fragment.createMultipartBody(file: File, galleryUri: Uri?): MultipartBody.Part? {
-    val imageStream: InputStream?
-    var bmp: Bitmap
-    var requestFile: RequestBody
-    val baoS: ByteArrayOutputStream? = ByteArrayOutputStream()
+fun Fragment.createMultipartBody(file: File): MultipartBody.Part? {
     val fileUri = Uri.fromFile(file)
     return if (file.exists()) {
 //                Log.d("edTaskFragment camera", "${file.absolutePath}")
 //                Log.d("edTaskFragment camera", "${Uri.fromFile(file)}")
-//        var compressedUri = compress(fileUri)
-//        imageStream = requireContext().contentResolver.openInputStream(compressedUri!!)
-        imageStream = requireContext().contentResolver.openInputStream(fileUri)
-        bmp = BitmapFactory.decodeStream(imageStream)
-
-        //將byteArrayOut進行品質壓縮 compress Quality 100->25
-        bmp.compress(Bitmap.CompressFormat.JPEG, 25, baoS)
-        requestFile = RequestBody.create(MediaType.parse("image/jpg"), baoS!!.toByteArray())
+        val imageStream = requireContext().contentResolver.openInputStream(fileUri)
+        val degree = getImageDegree(requireContext(), fileUri)
+        val bmp = BitmapFactory.decodeStream(imageStream)
+        val rotatedBmp = rotateBitmap(bmp, degree)
+        //將byteArrayOut進行品質壓縮 compress Quality 100->15
+        val baoS: ByteArrayOutputStream? = ByteArrayOutputStream()
+        rotatedBmp.compress(Bitmap.CompressFormat.JPEG, 15, baoS)
+        val requestFile = RequestBody.create(MediaType.parse("image/jpg"), baoS!!.toByteArray())
         Log.d("gallery", "requestFile Size ${requestFile.contentLength()}")
         MultipartBody.Part.createFormData("image", file.name, requestFile)
-    } else {
-        if (galleryUri != null) {
-            imageStream = requireContext().contentResolver.openInputStream(galleryUri)
-            val degree = getImageDegree(requireContext(), galleryUri)
-            bmp = BitmapFactory.decodeStream(imageStream)
-            //將byteArrayOut進行品質壓縮 compress Quality 100->25
-            bmp = rotateBitmap(bmp, degree)
-            bmp.compress(Bitmap.CompressFormat.JPEG, 25, baoS)
+    } else null
+}
 
-            requestFile = RequestBody.create(MediaType.parse("image/jpg"), baoS!!.toByteArray())
-            Log.d("gallery", "requestFile Size ${requestFile.contentLength()}")
-            MultipartBody.Part.createFormData("image", "sample.jpg", requestFile)
+//  相簿呼叫,傳入Uri
+@RequiresApi(Build.VERSION_CODES.N)
+fun Fragment.createMultipartBody(galleryUri: Uri?): MultipartBody.Part? {
+    return if (galleryUri != null) {
+        val imageStream = requireContext().contentResolver.openInputStream(galleryUri)
+        val degree = getImageDegree(requireContext(), galleryUri)
+        val bmp = BitmapFactory.decodeStream(imageStream)
+        val rotatedBmp = rotateBitmap(bmp, degree)
+        //將byteArrayOut進行品質壓縮 compress Quality 100->15
+        val baoS: ByteArrayOutputStream? = ByteArrayOutputStream()
+        rotatedBmp.compress(Bitmap.CompressFormat.JPEG, 15, baoS)
+        val requestFile = RequestBody.create(MediaType.parse("image/jpg"), baoS!!.toByteArray())
+        Log.d("gallery", "requestFile Size ${requestFile.contentLength()}")
+        MultipartBody.Part.createFormData("image", "sample.jpg", requestFile)
+
 //en ping
 //                requireContext().contentResolver.openInputStream(galleryUri).use {
 //                    val reqFile = RequestBody.create(MediaType.parse("image/jpg"), it!!.readBytes())
 //                    Log.d("gallery", "reqFile Size ${reqFile.contentLength()}")
 //                    MultipartBody.Part.createFormData("image", "sample.jpg", reqFile)
 //                }
-        } else null
-    }
+    } else null
 }
 
+// 取得原圖的EXIF ORIENTATION
 @RequiresApi(Build.VERSION_CODES.N)
-private fun getImageDegree(context: Context, uri: Uri): Int{
+private fun getImageDegree(context: Context, uri: Uri): Int {
     var degree = 0
     val input = context.contentResolver.openInputStream(uri)!!
     val exifInterface = ExifInterface(input)
@@ -177,7 +179,8 @@ private fun getImageDegree(context: Context, uri: Uri): Int{
     return degree
 }
 
-private fun rotateBitmap(bitmap: Bitmap, degree: Int): Bitmap{
+// 將原圖的ORIENTATION與bitmap傳入,回傳一個新的bitmap
+private fun rotateBitmap(bitmap: Bitmap, degree: Int): Bitmap {
     val w = bitmap.width
     val h = bitmap.height
     val matrix = Matrix()
