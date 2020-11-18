@@ -17,7 +17,6 @@ import kotlinx.android.synthetic.main.dialog_new_card.view.*
 import kotlinx.android.synthetic.main.fragment_card.*
 import kotlinx.android.synthetic.main.fragment_card.view.*
 import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 
 
@@ -45,7 +44,7 @@ class CardFragment : Fragment()
 
         getCards()
         cardAdapter = RvCardAdapter()
-        rootView.rv_card.adapter = cardAdapter.apply {
+        rootView.rv_privateCard.adapter = cardAdapter.apply {
             setCardClickListener(object : RvCardAdapter.IClickListener {
                 override fun click(position: Int) {     //點擊卡片,到編輯頁面,add EdCareFragment
                     showToast("Item $position clicked")
@@ -166,8 +165,8 @@ class CardFragment : Fragment()
 
     companion object {
         val cardList = mutableListOf<CardResponse.UserData.ShowCard>()
-        val cameraRequestCode = 100
-        val albumRequestCode = 200
+        const val CAMERA_REQUEST_CODE = 100
+        const val GALLERY_REQUEST_CODE = 200
     }
 
     private fun getCards() {    //取得所有資料
@@ -205,7 +204,7 @@ class CardFragment : Fragment()
                     }
                     Log.d("Success!", "getCard OK")
                     cardAdapter.update(cardList)
-                    rootView.rv_card.smoothScrollToPosition(cardList.size)
+                    rootView.rv_privateCard.smoothScrollToPosition(cardList.size)
                 }
             })
     }
@@ -271,9 +270,9 @@ class CardFragment : Fragment()
     }
 
     private fun setRvLayout() {     //將recyclerview接上,設置佈局水平方式
-        rootView.rv_card.layoutManager =
+        rootView.rv_privateCard.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-        LinearSnapHelper().attachToRecyclerView(rootView.rv_card)     //recyclerview捲動停止時,可以讓item位於畫面中間
+        LinearSnapHelper().attachToRecyclerView(rootView.rv_privateCard)     //recyclerview捲動停止時,可以讓item位於畫面中間
     }
 
     private fun newCardFab() {

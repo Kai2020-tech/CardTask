@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                         response: Response<RegisterResponse>
                     ) {
                         if (response.isSuccessful) {    //request 200,註冊成功
-                            changeEdtextVisibility()
+                            changeEdTextVisibility()
                             Toast.makeText(
                                 this@MainActivity,
                                 response.body()?.isSuccess.toString(),
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
                         response: Response<LoginResponse>
                     ) {
                         if (response.isSuccessful) {    //request 200,成功
-                            changeEdtextVisibility()
+                            changeEdTextVisibility()
                             token = response.body()?.login?.userToken.toString()
                             Toast.makeText(
                                 this@MainActivity,
@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity() {
     //    按返回鍵判斷是否在register
     override fun onBackPressed() {
         if (btn_cardConfirm.visibility == View.VISIBLE) {
-            changeEdtextVisibility()
+            changeEdTextVisibility()
 
             Toast.makeText(this, "再按一次退出App", Toast.LENGTH_SHORT).show()
         } else {
@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity() {
         nextFoocusView.requestFocus()
     }
 
-    fun changeEdtextVisibility() {
+    fun changeEdTextVisibility() {
         btn_cardConfirm.visibility = View.GONE
         ed_name.visibility = View.INVISIBLE
         btn_login.visibility = View.VISIBLE

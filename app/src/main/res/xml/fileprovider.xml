@@ -4,4 +4,5 @@
         name="images"
         path="Pictures" />
     <files-path name="internal_images" path="images/"/>
+    <external-path name="external_files" path="."/>
 </paths>
