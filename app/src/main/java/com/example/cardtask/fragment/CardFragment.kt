@@ -86,8 +86,7 @@ class CardFragment : Fragment()
         println("***************** onDestroyView $this")
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == cardRequestCode || requestCode == edTaskRequestCode) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) { if (requestCode == cardRequestCode || requestCode == edTaskRequestCode) {
             cardAdapter.update(cardList)
 //            val pos = data?.getIntExtra("pos", 0) ?: return
 //            cardAdapter.notifyItemChanged(pos)

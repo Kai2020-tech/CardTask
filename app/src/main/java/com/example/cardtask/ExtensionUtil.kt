@@ -5,11 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
@@ -29,7 +29,9 @@ import kotlinx.android.synthetic.main.dialog_photo.view.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.InputStream
 
 fun Fragment.showToast(message: String) {
     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
@@ -118,6 +120,7 @@ fun Fragment.goToEdTask(showTask: CardResponse.UserData.ShowCard.ShowTask) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.N)
 fun Fragment.createMultipartBody(file: File, galleryUri: Uri?): MultipartBody.Part? {
     val imageStream: InputStream?
     var bmp: Bitmap
@@ -140,6 +143,7 @@ fun Fragment.createMultipartBody(file: File, galleryUri: Uri?): MultipartBody.Pa
     } else {
         if (galleryUri != null) {
             imageStream = requireContext().contentResolver.openInputStream(galleryUri)
+            readImageDegree(requireContext(), galleryUri)
             bmp = BitmapFactory.decodeStream(imageStream)
             //將byteArrayOut進行品質壓縮 compress Quality 100->25
             bmp.compress(Bitmap.CompressFormat.JPEG, 25, baoS)
@@ -154,6 +158,21 @@ fun Fragment.createMultipartBody(file: File, galleryUri: Uri?): MultipartBody.Pa
 //                }
         } else null
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.N)
+private fun readImageDegree(context: Context, uri: Uri){
+    var degree = 0
+    val input = context.contentResolver.openInputStream(uri)!!
+    val exifInterface = ExifInterface(input)
+    val orientation =
+        exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+    when (orientation) {
+        ExifInterface.ORIENTATION_ROTATE_90 -> degree = 90
+        ExifInterface.ORIENTATION_ROTATE_180 -> degree = 180
+        ExifInterface.ORIENTATION_ROTATE_270 -> degree = 270
+    }
+    Log.i("image degree", "$degree")
 }
 
 //private fun Fragment.compressPhoto(path: Uri):Bitmap {
