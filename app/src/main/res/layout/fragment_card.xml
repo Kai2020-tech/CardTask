@@ -59,7 +59,7 @@
         android:layout_marginEnd="8dp"
         android:text="更名"
         app:layout_constraintBaseline_toBaselineOf="@+id/ed_cardName"
-        app:layout_constraintEnd_toStartOf="@+id/btn_addGroup"
+        app:layout_constraintEnd_toStartOf="@+id/btn_editUsers"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@+id/ed_cardName" />
@@ -84,13 +84,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btn_addGroup"
+        android:id="@+id/btn_editUsers"
         style="@style/buttonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
-        android:text="加入使用者"
+        android:text="編輯使用者"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_cardUpdate"

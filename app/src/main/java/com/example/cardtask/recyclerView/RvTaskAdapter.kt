@@ -54,10 +54,12 @@ class RvTaskAdapter() : RecyclerView.Adapter<RvTaskAdapter.ViewHolder>() {
         var colorNum = R.color.origin
         colorNum = when (currentItem.tag) {
             "red" -> R.color.red
+            "orange" -> R.color.orange
             "yellow" -> R.color.yellow
             "green" -> R.color.green
-            "pink" -> R.color.pink
             "blue" -> R.color.blue
+            "darkBlue" -> R.color.darkBlue
+            "purple" -> R.color.purple
             else -> R.color.origin
         }
         holder.taskTitle.text = currentItem.title
