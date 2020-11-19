@@ -14,8 +14,8 @@ import com.example.cardtask.*
 import com.example.cardtask.api.*
 import com.example.cardtask.recyclerView.RvCardAdapter
 import kotlinx.android.synthetic.main.dialog_new_card.view.*
-import kotlinx.android.synthetic.main.fragment_card.*
-import kotlinx.android.synthetic.main.fragment_card.view.*
+import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.fragment_main.view.*
 import retrofit2.Call
 import retrofit2.Response
 
@@ -33,7 +33,7 @@ class MainFragment : Fragment()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        rootView = inflater.inflate(R.layout.fragment_card, container, false)
+        rootView = inflater.inflate(R.layout.fragment_main, container, false)
         return rootView
     }
 
@@ -99,7 +99,7 @@ class MainFragment : Fragment()
         return Pair(object : RvCardAdapter.IClickListener {
             override fun click(position: Int) {
                 Toast.makeText(activity, "Item $position clicked", Toast.LENGTH_SHORT).show()
-                val edCardFragment = EdCardFragment()
+                val edCardFragment = CardFragment()
                 edCardFragment.position = position
                 edCardFragment.cardId = cardList[position].id
 
@@ -209,7 +209,7 @@ class MainFragment : Fragment()
     }
 
     private fun goToEdCard(position: Int) {
-        val edCardFragment = EdCardFragment()
+        val edCardFragment = CardFragment()
 //                    fragment傳遞資料要使用系統的arguments
         edCardFragment.arguments = Bundle().apply {
             putInt("pos", position)

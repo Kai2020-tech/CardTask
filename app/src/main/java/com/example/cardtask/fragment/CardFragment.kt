@@ -17,8 +17,8 @@ import com.example.cardtask.goToEdTask
 import com.example.cardtask.hideKeyboard
 import com.example.cardtask.recyclerView.RvTaskAdapter
 import com.example.cardtask.showToast
-import kotlinx.android.synthetic.main.fragment_ed_card.*
-import kotlinx.android.synthetic.main.fragment_ed_card.view.*
+import kotlinx.android.synthetic.main.fragment_card.*
+import kotlinx.android.synthetic.main.fragment_card.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,10 +30,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [EdCardFragment.newInstance] factory method to
+ * Use the [CardFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class EdCardFragment : Fragment() {
+class CardFragment : Fragment() {
 
     private lateinit var rootView: View
 
@@ -62,7 +62,7 @@ class EdCardFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        rootView = inflater.inflate(R.layout.fragment_ed_card, container, false)
+        rootView = inflater.inflate(R.layout.fragment_card, container, false)
         return rootView
     }
 
