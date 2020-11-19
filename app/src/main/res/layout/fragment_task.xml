@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/task"
     android:clickable="true"
-    tools:context=".fragment.TaskFragment"
+    tools:context=".fragment.NewTaskFragment"
     android:focusable="true">
 
     <!-- TODO: Update blank fragment layout -->

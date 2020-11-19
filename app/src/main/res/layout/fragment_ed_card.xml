@@ -5,10 +5,10 @@
     android:id="@+id/edCardFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/card"
     android:clickable="true"
-    tools:context=".fragment.EdCardFragment"
     android:focusable="true"
-    android:background="@drawable/card">
+    tools:context=".fragment.EdCardFragment">
 
     <EditText
         android:id="@+id/ed_cardName"
@@ -36,7 +36,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ed_cardName"
         app:layout_constraintVertical_bias="0.0"
-        tools:listitem="@layout/task_model" />
+        tools:listitem="@layout/model_task" />
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -53,11 +53,15 @@
     <Button
         android:id="@+id/btn_cardUpdate"
         style="@style/buttonStyle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="重新命名"
+        android:layout_marginEnd="8dp"
+        android:text="更名"
         app:layout_constraintBaseline_toBaselineOf="@+id/ed_cardName"
+        app:layout_constraintEnd_toStartOf="@+id/btn_addGroup"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@+id/ed_cardName" />
 
     <TextView
@@ -68,6 +72,28 @@
         android:layout_marginTop="2dp"
         android:text="TextView"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_groupCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="2dp"
+        app:layout_constraintStart_toEndOf="@+id/tv_EdCardId"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_addGroup"
+        style="@style/buttonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:text="加入使用者"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btn_cardUpdate"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

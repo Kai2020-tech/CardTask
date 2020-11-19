@@ -10,8 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cardtask.R
 import com.example.cardtask.api.CardResponse
-import kotlinx.android.synthetic.main.card_model.view.*
-import java.text.SimpleDateFormat
+import kotlinx.android.synthetic.main.model_card.view.*
 
 class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
 
@@ -77,7 +76,7 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val cardView = LayoutInflater.from(parent.context).inflate(
-            R.layout.card_model, parent, false
+            R.layout.model_card, parent, false
         )
         return ViewHolder(cardView)
     }

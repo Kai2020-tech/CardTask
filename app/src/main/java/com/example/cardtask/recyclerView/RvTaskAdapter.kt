@@ -1,17 +1,15 @@
 package com.example.cardtask.recyclerView
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cardtask.R
 import com.example.cardtask.api.CardResponse
-import kotlinx.android.synthetic.main.task_model.view.*
+import kotlinx.android.synthetic.main.model_task.view.*
 
 //class RvTaskAdapter(private val clickListener: RvTaskAdapter.IClickListener) : RecyclerView.Adapter<RvTaskAdapter.ViewHolder>() {
 class RvTaskAdapter() : RecyclerView.Adapter<RvTaskAdapter.ViewHolder>() {
@@ -42,7 +40,7 @@ class RvTaskAdapter() : RecyclerView.Adapter<RvTaskAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val taskView = LayoutInflater.from(parent.context).inflate(
-            R.layout.task_model, parent, false
+            R.layout.model_task, parent, false
         )
         return ViewHolder(taskView)
     }

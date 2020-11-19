@@ -52,17 +52,6 @@ interface ApiService {
         @Body cardName: NewCard
     ): Call<UpdateCardResponse>
 
-//    @POST("task")   //新增Task
-//    @FormUrlEncoded
-//    fun newTask(
-//        @Header("userToken") userToken: String,
-//        @Field("card_id") card_id: Int = 0,
-//        @Field("image") image: String?,
-//        @Field("title") taskName: String?,
-//        @Field("tag") color: String?,
-//        @Field("description") description: String?
-//    ): Call<NewTaskResponse>
-
     @POST("task")   //新增Task
     @Multipart
     fun createTask(
@@ -88,19 +77,6 @@ interface ApiService {
         @Part("delete_image") del_img: Boolean?
     ): Call<UpdateTaskResponse>
 
-//    @PUT("task/{taskId}")   //更新Task
-//    @Multipart
-//    fun updateTask(
-//        @Path("taskId") taskId: Int,
-//        @Header("userToken") userToken: String,
-//        @Body requestBody: RequestBody
-//    ): Call<UpdateTaskResponse>
-//    @PUT("task/{taskId}")   //更新Task
-//    @Multipart
-//    fun updateImage(
-//        @Header("userToken") userToken: String,
-//        @Part image: MultipartBody.Part?
-//    ): Call<UpdateTaskResponse>
 
     @DELETE("task/{id}")   //刪除Task
     fun deleteTask(

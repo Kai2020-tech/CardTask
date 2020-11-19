@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/card"
-    tools:context=".fragment.CardFragment">
+    tools:context=".fragment.MainFragment">
 <!--    android:background="@android:color/holo_red_light"-->
 
     <!-- TODO: Update blank fragment layout -->
@@ -23,7 +23,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/card_model" />
+        tools:listitem="@layout/model_card" />
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

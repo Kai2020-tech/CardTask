@@ -22,8 +22,8 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.example.cardtask.api.CardResponse
-import com.example.cardtask.fragment.CardFragment.Companion.CAMERA_REQUEST_CODE
-import com.example.cardtask.fragment.CardFragment.Companion.GALLERY_REQUEST_CODE
+import com.example.cardtask.fragment.MainFragment.Companion.CAMERA_REQUEST_CODE
+import com.example.cardtask.fragment.MainFragment.Companion.GALLERY_REQUEST_CODE
 import com.example.cardtask.fragment.EdTaskFragment
 import kotlinx.android.synthetic.main.dialog_photo.view.*
 import okhttp3.MediaType
@@ -31,7 +31,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.InputStream
 
 fun Fragment.showToast(message: String) {
     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
@@ -114,7 +113,7 @@ fun Fragment.goToEdTask(showTask: CardResponse.UserData.ShowCard.ShowTask) {
     activity!!.supportFragmentManager?.beginTransaction()?.apply {
         setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
         add(R.id.frame_layout, edTaskFragment)
-        addToBackStack("CardFragment")
+        addToBackStack("MainFragment")
         commit()
     }
 }
@@ -130,7 +129,7 @@ fun Fragment.createMultipartBody(file: File): MultipartBody.Part? {
         val degree = getImageDegree(requireContext(), fileUri)
         val bmp = BitmapFactory.decodeStream(imageStream)
         val rotatedBmp = rotateBitmap(bmp, degree)
-        //將byteArrayOut進行品質壓縮 compress Quality 100->15
+        //將bitmap進行品質壓縮到byteArrayOut, compress Quality 100->15
         val baoS: ByteArrayOutputStream? = ByteArrayOutputStream()
         rotatedBmp.compress(Bitmap.CompressFormat.JPEG, 15, baoS)
         val requestFile = RequestBody.create(MediaType.parse("image/jpg"), baoS!!.toByteArray())
@@ -147,7 +146,7 @@ fun Fragment.createMultipartBody(galleryUri: Uri?): MultipartBody.Part? {
         val degree = getImageDegree(requireContext(), galleryUri)
         val bmp = BitmapFactory.decodeStream(imageStream)
         val rotatedBmp = rotateBitmap(bmp, degree)
-        //將byteArrayOut進行品質壓縮 compress Quality 100->15
+        //將bitmap進行品質壓縮到byteArrayOut, compress Quality 100->15
         val baoS: ByteArrayOutputStream? = ByteArrayOutputStream()
         rotatedBmp.compress(Bitmap.CompressFormat.JPEG, 15, baoS)
         val requestFile = RequestBody.create(MediaType.parse("image/jpg"), baoS!!.toByteArray())

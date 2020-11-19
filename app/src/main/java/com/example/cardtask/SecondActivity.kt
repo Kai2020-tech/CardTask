@@ -2,11 +2,9 @@ package com.example.cardtask
 
 
 import android.content.Intent
-import android.media.Image
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -16,16 +14,15 @@ import androidx.core.view.GravityCompat
 import com.bumptech.glide.Glide
 import com.example.cardtask.api.Api
 import com.example.cardtask.api.CardResponse
-import com.example.cardtask.fragment.CardFragment
+import com.example.cardtask.fragment.MainFragment
 import kotlinx.android.synthetic.main.activity_second.*
 import kotlinx.android.synthetic.main.activity_second.view.*
-import kotlinx.android.synthetic.main.nav_header_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-val cardFragment = CardFragment()
+val cardFragment = MainFragment()
 
 class SecondActivity : AppCompatActivity() {
 
@@ -74,7 +71,7 @@ class SecondActivity : AppCompatActivity() {
                                 .into(userImage)
                         }
 //                        res?.userData?.showCards?.forEach { card ->
-//                            CardFragment.cardList.add(card)
+//                            MainFragment.cardList.add(card)
 //                        }
 //                        Log.d("Success!", "getCard OK")
                     } else {    //token失效 ,啓動MainActivity重新登入

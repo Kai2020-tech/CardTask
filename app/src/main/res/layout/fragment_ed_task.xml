@@ -8,7 +8,7 @@
     android:background="@drawable/task"
     android:clickable="true"
     android:focusable="true"
-    tools:context=".fragment.TaskFragment">
+    tools:context=".fragment.NewTaskFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <EditText
@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:background="#59FFFFFF"
+        android:background="@drawable/bg_shape"
         android:gravity="center_horizontal"
         android:hint="Task Title"
         android:textSize="24sp"
@@ -49,6 +49,7 @@
         android:id="@+id/ed_taskDescription2"
         style="@style/task_description"
         android:layout_marginTop="16dp"
+        android:background="@drawable/bg_shape"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ed_taskTitle2" />
