@@ -18,7 +18,7 @@ class RvTaskAdapter() : RecyclerView.Adapter<RvTaskAdapter.ViewHolder>() {
     private val rvTaskList = mutableListOf<CardResponse.UserData.ShowCard.ShowTask>()
     var listener: (CardResponse.UserData.ShowCard.ShowTask) -> Unit = {}
     var longClickListener: (position: Int) -> Boolean = { true }
-    var taskLongClick:(CardResponse.UserData.ShowCard.ShowTask) -> Boolean = { true }
+    var taskLongClick: (CardResponse.UserData.ShowCard.ShowTask) -> Boolean = { true }
 
 //    fun setListener(mClickListener: IClickListener,mLongClickListener: ILongClickListener){
 //        this.listener = mClickListener

@@ -1,25 +1,34 @@
 package com.example.cardtask.api
 import com.google.gson.annotations.SerializedName
 
-
-data class UserResponse(
+//查詢card的users
+data class UserGroupResponse(
     @SerializedName("status")
     val status: Boolean = false, // true
-    @SerializedName("user_data")
-    val userData: UserData = UserData()
+    @SerializedName("users_data")
+    val usersData: List<UsersData> = listOf()
 ) {
-    data class UserData(
+    data class UsersData(
         @SerializedName("created_at")
-        val createdAt: String = "", // 2020-09-15T04:01:19.000000Z
+        val createdAt: String = "", // 2020-09-02T08:07:20.000000Z
         @SerializedName("email")
-        var email: String = "", // gill@gmail.com
+        val email: String = "", // ishida624@gmail.com
         @SerializedName("id")
-        val id: Int = 0, // 3
+        val id: Int = 0, // 2
         @SerializedName("image")
-        var image: String = "",
+        val image: String = "", // null
+        @SerializedName("pivot")
+        val pivot: Pivot = Pivot(),
         @SerializedName("updated_at")
-        val updatedAt: String = "", // 2020-09-18T09:20:10.000000Z
+        val updatedAt: String = "", // 2020-09-21T07:54:41.000000Z
         @SerializedName("username")
-        var username: String = "" // gill
-    )
+        val username: String = "" // admin
+    ) {
+        data class Pivot(
+            @SerializedName("card_id")
+            val cardId: Int = 0, // 1
+            @SerializedName("users_id")
+            val usersId: Int = 0 // 2
+        )
+    }
 }

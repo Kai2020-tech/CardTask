@@ -13,46 +13,51 @@ private const val BASE_URL = "https://dodo.gill.gq/api/"
 var token = ""
 
 interface ApiService {
-    //    @Headers("Content-type: application/json","Accept: application/json")
-    @POST("register")   //註冊
-    fun register(
-        @Body user: SendRegister
-    ): Call<RegisterResponse>
 
-    @POST("userToken")  //登入
-    fun login(
-        @Body user: SendLogin
-    ): Call<LoginResponse>
+    //註冊
+    @POST("register")
+    fun register(@Body user: SendRegister): Call<RegisterResponse>
 
-//    @GET("userToken")  //取得使用者
-//    fun getUser(
-//        @Header("userToken") userToken: String
-//    ): Call<LoginResponse>
+    //登入
+    @POST("userToken")
+    fun login(@Body user: SendLogin): Call<LoginResponse>
 
-    @Headers("Content-type: application/json")  //取得所有資料
+    //取得所有資料
+    @Headers("Content-type: application/json")
     @GET("card")
     fun getCard(@Header("userToken") userToken: String): Call<CardResponse>
 
-    @POST("card")   //新增卡片
+    //取得卡片的使用者
+    @GET("groups/card/users/{cardId}")
+    fun getUsers(
+        @Header("userToken") userToken: String,
+        @Path("cardId") id: Int
+    ): Call<UserGroupResponse>
+
+    //新增卡片
+    @POST("card")
     fun newCard(
         @Header("userToken") userToken: String,
         @Body cardName: NewCard
     ): Call<NewCardResponse>
 
-    @DELETE("card/{id}")   //刪除卡片
+    //刪除卡片
+    @DELETE("card/{id}")
     fun deleteCard(
         @Header("userToken") userToken: String,
         @Path("id") id: Int
     ): Call<DeleteCardResponse>
 
-    @PUT("card/{id}")   //更新卡片
+    //更新卡片
+    @PUT("card/{id}")
     fun updateCard(
         @Header("userToken") userToken: String,
         @Path("id") id: Int,
         @Body cardName: NewCard
     ): Call<UpdateCardResponse>
 
-    @POST("task")   //新增Task
+    //新增Task
+    @POST("task")
     @Multipart
     fun createTask(
         @Header("userToken") userToken: String,
@@ -63,7 +68,8 @@ interface ApiService {
         @Part description: MultipartBody.Part?
     ): Call<NewTaskResponse>
 
-    @POST("task/{taskId}")   //更新Task
+    //更新Task
+    @POST("task/{taskId}")
     @Multipart
     fun updateTask(
         @Path("taskId") taskId: Int,
@@ -77,8 +83,8 @@ interface ApiService {
         @Part("delete_image") del_img: Boolean?
     ): Call<UpdateTaskResponse>
 
-
-    @DELETE("task/{id}")   //刪除Task
+    //刪除Task
+    @DELETE("task/{id}")
     fun deleteTask(
         @Header("userToken") userToken: String,
         @Path("id") id: Int

@@ -18,8 +18,11 @@ import com.example.cardtask.fragment.MainFragment.Companion.cardList
 import com.example.cardtask.goToEdTask
 import com.example.cardtask.hideKeyboard
 import com.example.cardtask.recyclerView.RvTaskAdapter
+import com.example.cardtask.recyclerView.RvUsersAdapter
 import com.example.cardtask.showToast
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.android.synthetic.main.dialog_bottom_sheet.*
+import kotlinx.android.synthetic.main.dialog_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.fragment_card.*
 import kotlinx.android.synthetic.main.fragment_card.view.*
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -42,6 +45,7 @@ class CardFragment : Fragment() {
     private lateinit var rootView: View
 
     lateinit var taskAdapter: RvTaskAdapter
+    lateinit var usersAdapter: RvUsersAdapter
     lateinit var tasks: MutableList<CardResponse.UserData.ShowCard.ShowTask>
     private val newTaskRequestCode = 555
     private val edTaskRequestCode = 111
@@ -49,6 +53,7 @@ class CardFragment : Fragment() {
 
     var cardPosition = 0
     var cardId = 0
+    var userList = mutableListOf<UserGroupResponse.UsersData>()
     var isPrivate = true
 
 
@@ -80,8 +85,10 @@ class CardFragment : Fragment() {
 
         rootView.tv_EdCardId.text = cardId.toString()
         getCards()
+        getUsers()
 
         rootView.ed_cardName.setText(cardList[cardPosition].cardName)
+//        task recyclerView
         tasks = cardList[cardPosition].showTasks.toMutableList()
         taskAdapter = RvTaskAdapter()
 
@@ -125,6 +132,12 @@ class CardFragment : Fragment() {
 //            (bsView.parent as ViewGroup?)?.background = ColorDrawable(Color.TRANSPARENT)
 //            bottomSheetDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))  //設爲透明無效
             bottomSheetDialog.show()
+
+            //        users recyclerView
+            usersAdapter = RvUsersAdapter(this)
+            bottomSheetDialog.rv_userOfCard.adapter = usersAdapter
+            bottomSheetDialog.rv_userOfCard.layoutManager = LinearLayoutManager(activity)
+            usersAdapter.update(userList)
         }
 //  Fab新增Task,開啓task fragment
         newTaskFab()
@@ -137,7 +150,28 @@ class CardFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun getCards() {    //取得所有資料
+    //取得卡片的使用者
+    private fun getUsers() {
+        Api.retrofitService.getUsers(token, cardId)
+            .enqueue(object : Callback<UserGroupResponse> {
+                override fun onFailure(call: Call<UserGroupResponse>, t: Throwable) {
+                    Log.e("getUsers Failed", t.toString())
+                }
+
+                override fun onResponse(call: Call<UserGroupResponse>, response: Response<UserGroupResponse>) {
+                    if (response.isSuccessful) {
+                        val res = response.body()
+                        Log.d("Success!", "$res")
+                        res?.usersData?.forEach {
+                            userList.add(it)
+                        }
+                    }
+                }
+            })
+    }
+
+    //取得所有資料
+    private fun getCards() {
         Api.retrofitService.getCard(token)
             .enqueue(object : Callback<CardResponse> {
                 override fun onFailure(call: Call<CardResponse>, t: Throwable) {
