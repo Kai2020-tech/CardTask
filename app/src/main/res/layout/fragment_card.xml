@@ -9,6 +9,22 @@
     android:clickable="true"
     android:focusable="true"
     tools:context=".fragment.CardFragment">
+    <!--背景圖-->
+    <!--https://github.com/JastAir/Android-BackgroundChart?utm_source=android-arsenal.com&utm_medium=referral&utm_campaign=7561-->
+    <com.fdev.backgroundchart.GradientChart
+        android:id="@+id/gradientChart_cardFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:plusColorStart="#FFCCBC"
+        app:plusColorEnd="#FFE0B2"
+        app:minusColorStart="#FFE0B2"
+        app:minusColorEnd="#FFE0B2"
+        app:zoom="10"
+        app:isBezier="true"/>
 
     <EditText
         android:id="@+id/ed_cardName"

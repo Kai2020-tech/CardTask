@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import com.example.cardtask.*
 import com.example.cardtask.api.*
 import com.example.cardtask.recyclerView.RvCardAdapter
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_new_card.view.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.fragment_main.view.*
@@ -33,6 +34,7 @@ class MainFragment : Fragment()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
+
         rootView = inflater.inflate(R.layout.fragment_main, container, false)
         return rootView
     }
@@ -41,6 +43,11 @@ class MainFragment : Fragment()
         super.onViewCreated(view, savedInstanceState)
         val perf = SharedPreferences(requireContext())
         token = perf.getData() ?: ""
+
+        //  背景圖用
+        gradientChart_mainFragment.chartValues = arrayOf(
+            10f, 30f, 25f, 32f, 13f, 5f, 18f, 36f, 20f, 30f, 28f, 27f, 29f
+        )
 
         getCards()
         cardAdapter = RvCardAdapter()
@@ -86,7 +93,8 @@ class MainFragment : Fragment()
         println("***************** onDestroyView $this")
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) { if (requestCode == cardRequestCode || requestCode == edTaskRequestCode) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == cardRequestCode || requestCode == edTaskRequestCode) {
             cardAdapter.update(cardList)
 //            val pos = data?.getIntExtra("pos", 0) ?: return
 //            cardAdapter.notifyItemChanged(pos)

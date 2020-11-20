@@ -3,12 +3,14 @@ package com.example.cardtask.fragment
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cardtask.R
 import com.example.cardtask.api.*
@@ -17,8 +19,10 @@ import com.example.cardtask.goToEdTask
 import com.example.cardtask.hideKeyboard
 import com.example.cardtask.recyclerView.RvTaskAdapter
 import com.example.cardtask.showToast
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.fragment_card.*
 import kotlinx.android.synthetic.main.fragment_card.view.*
+import kotlinx.android.synthetic.main.fragment_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -68,6 +72,12 @@ class CardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        //  背景圖用
+        gradientChart_cardFragment.chartValues = arrayOf(
+            10f, 30f, 25f, 32f, 13f, 5f, 18f, 36f, 20f, 30f, 28f, 27f, 29f
+        )
+
         rootView.tv_EdCardId.text = cardId.toString()
         getCards()
 
@@ -101,7 +111,22 @@ class CardFragment : Fragment() {
             hideKeyboard(tv_EdCardId)
             cardRename()
         }
-//        新增Task,開啓task fragment
+
+//  編輯使用者,開啓bottom sheet
+        rootView.btn_editUsers.setOnClickListener {
+
+            val bottomSheetDialog = BottomSheetDialog(requireContext())
+            val bsView: View = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_bottom_sheet, null)
+            bottomSheetDialog.setContentView(bsView)
+            //設爲透明無效
+            val parent = bsView.parent as ViewGroup //取得BottomSheet介面設定
+            parent.setBackgroundResource(android.R.color.transparent) //將背景設為透明，否則預設白底
+
+//            (bsView.parent as ViewGroup?)?.background = ColorDrawable(Color.TRANSPARENT)
+//            bottomSheetDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))  //設爲透明無效
+            bottomSheetDialog.show()
+        }
+//  Fab新增Task,開啓task fragment
         newTaskFab()
     }
 

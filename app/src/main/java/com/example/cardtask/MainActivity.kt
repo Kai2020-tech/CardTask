@@ -20,6 +20,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+//  背景圖用
+        gradientChart.chartValues = arrayOf(
+            10f, 30f, 25f, 32f, 13f, 5f, 18f, 36f, 20f, 30f, 28f, 27f, 29f
+        )
 
         val pref = SharedPreferences(this)
         if (!pref.getData().isNullOrEmpty()) {

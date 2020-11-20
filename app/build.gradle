@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.cardtask"
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -53,4 +53,10 @@ dependencies {
 
 //第三方裁切套件cropperImage
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+
+//https://codelabs.developers.google.com/codelabs/mdc-101-kotlin#1
+    api 'com.google.android.material:material:1.1.0-alpha06'
+
+//背景圖 https://github.com/JastAir/Android-BackgroundChart?utm_source=android-arsenal.com&utm_medium=referral&utm_campaign=7561
+    implementation 'com.github.JastAir:Android-BackgroundChart:1.0.1-alpha'
 }

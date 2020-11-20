@@ -3,6 +3,7 @@ package com.example.cardtask.recyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -27,6 +28,7 @@ class RvTaskAdapter() : RecyclerView.Adapter<RvTaskAdapter.ViewHolder>() {
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val taskTitle: TextView = itemView.ed_taskTitle
         val cvTask: ConstraintLayout = itemView.cv_task
+        val taskColor: ImageView = itemView.img_taskColor
 
 
 //        init {
@@ -63,7 +65,8 @@ class RvTaskAdapter() : RecyclerView.Adapter<RvTaskAdapter.ViewHolder>() {
             else -> R.color.origin
         }
         holder.taskTitle.text = currentItem.title
-        holder.cvTask.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, colorNum))
+//        holder.cvTask.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, colorNum))
+        holder.taskColor.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, colorNum))
         holder.cvTask.setOnClickListener { listener.invoke(currentItem) }
         holder.cvTask.setOnLongClickListener {
             longClickListener.invoke(position)
