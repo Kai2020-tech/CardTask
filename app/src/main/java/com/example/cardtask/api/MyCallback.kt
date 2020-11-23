@@ -16,10 +16,11 @@ abstract class MyCallback<T> : Callback<T> {
         if (response.isSuccessful) {
             onSuccess(call, response)
         } else {
+            notSuccess(call, response)
             Log.d("res", "${response.body().toString()}")
         }
     }
-    open fun notSuccess() {}
+    open fun notSuccess(call: Call<T>, response: Response<T>) {}
     abstract fun onSuccess(call: Call<T>, response: Response<T>)
 //    abstract fun onFailure()
 //    abstract fun notSuccess(call: Call<T>, response: Response<T>)

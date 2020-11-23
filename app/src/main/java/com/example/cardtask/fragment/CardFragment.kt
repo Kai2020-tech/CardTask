@@ -44,6 +44,7 @@ private const val ARG_PARAM2 = "param2"
 class CardFragment : Fragment() {
 
     private lateinit var rootView: View
+    private var bottomSheet: View? = null
 
     lateinit var taskAdapter: RvTaskAdapter
     lateinit var usersAdapter: RvUsersAdapter
@@ -127,29 +128,34 @@ class CardFragment : Fragment() {
 
 //  編輯使用者,開啓bottom sheet,建立user recyclerView
         rootView.btn_editUsers.setOnClickListener {
-
             val bottomSheetDialog = BottomSheetDialog(requireContext())
             val bsView: View = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_bottom_sheet, null)
             bottomSheetDialog.setContentView(bsView)
+            bottomSheet = bsView
             val parent = bsView.parent as ViewGroup //取得BottomSheet介面設定
             parent.setBackgroundResource(android.R.color.transparent) //將背景設為透明，否則預設白底
-
 //            (bsView.parent as ViewGroup?)?.background = ColorDrawable(Color.TRANSPARENT)
             bottomSheetDialog.show()
-//          關閉bottom sheet
-            bottomSheetDialog.btn_closeBottomSheet.setOnClickListener {
-                bottomSheetDialog.dismiss()
-            }
-            bottomSheetDialog.btn_addUser.setOnClickListener {
-                val email =AddUser(bottomSheetDialog.ed_userEmail.text.toString())
-                addUser(email)
-            }
 
-            //        users recyclerView
+//        users recyclerView
             usersAdapter = RvUsersAdapter(this)
             bottomSheetDialog.rv_userOfCard.adapter = usersAdapter
             bottomSheetDialog.rv_userOfCard.layoutManager = LinearLayoutManager(activity)
             usersAdapter.update(userList)
+//            關閉bottom sheet
+            bottomSheetDialog.btn_closeBottomSheet.setOnClickListener {
+                bottomSheetDialog.dismiss()
+                bottomSheet = null
+            }
+//            加入使用者
+            bottomSheetDialog.btn_addUser.setOnClickListener {
+                val email = AddUser(bottomSheetDialog.ed_userEmail.text.toString())
+                addUser(email)
+                updateUsers()
+                getCards()
+            }
+
+
         }
 //  Fab新增Task,開啓task fragment
         newTaskFab()
@@ -172,12 +178,34 @@ class CardFragment : Fragment() {
 
                 override fun onResponse(call: Call<UserGroupResponse>, response: Response<UserGroupResponse>) {
                     if (response.isSuccessful) {
+//                        userList.clear()
+                        val res = response.body()
+                        Log.d("Success!", "$res")
+                        res?.usersData?.forEach {
+                            userList.add(it)
+                        }
+                    }
+                }
+            })
+    }
+
+    //更新卡片的使用者
+    private fun updateUsers() {
+        Api.retrofitService.getUsers(token, cardId)
+            .enqueue(object : Callback<UserGroupResponse> {
+                override fun onFailure(call: Call<UserGroupResponse>, t: Throwable) {
+                    Log.e("getUsers Failed", t.toString())
+                }
+
+                override fun onResponse(call: Call<UserGroupResponse>, response: Response<UserGroupResponse>) {
+                    if (response.isSuccessful) {
                         userList.clear()
                         val res = response.body()
                         Log.d("Success!", "$res")
                         res?.usersData?.forEach {
                             userList.add(it)
                         }
+                        usersAdapter.update(userList)
                     }
                 }
             })
@@ -299,12 +327,18 @@ class CardFragment : Fragment() {
             .show()
     }
 
-    private fun addUser(email: AddUser){
-        Api.retrofitService.addUser(token,cardId,email)
-            .enqueue(object :MyCallback<AddUserResponse>(){
+    private fun addUser(email: AddUser) {
+        Api.retrofitService.addUser(token, cardId, email)
+            .enqueue(object : MyCallback<AddUserResponse>() {
                 override fun onSuccess(call: Call<AddUserResponse>, response: Response<AddUserResponse>) {
-                    getUsers()
                     showToast("使用者已加入")
+                    updateUsers()
+                    hideKeyboard(tv_groupCard)
+                    bottomSheet?.ed_userEmail?.text?.clear()
+                }
+
+                override fun notSuccess(call: Call<AddUserResponse>, response: Response<AddUserResponse>) {
+                    showToast("${response.errorBody()}")
                 }
             })
     }

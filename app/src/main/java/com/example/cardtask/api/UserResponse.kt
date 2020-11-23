@@ -52,3 +52,11 @@ data class AddUserResponse(
         val usersId: Int = 0 // 2
     )
 }
+
+
+data class AddUserFailResponse(
+    @SerializedName("error")
+    val error: String = "", // user search not found
+    @SerializedName("status")
+    val status: Boolean = false // false
+)

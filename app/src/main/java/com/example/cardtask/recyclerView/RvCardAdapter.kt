@@ -40,6 +40,7 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
         val cardName: TextView = itemView.tv_cardTitle
         val cardId: TextView = itemView.tv_cardId
         val cardUpdateTime: TextView = itemView.tv_update_time
+        val groupCard = itemView.tv_groupCard
         private val rvTask: RecyclerView? = itemView.findViewById<RecyclerView>(R.id.rv_task)
         private val taskAdapter: RvTaskAdapter = RvTaskAdapter()/*.apply {
             setListener(object : RvTaskAdapter.IClickListener{
@@ -100,8 +101,10 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
             HtmlCompat.FROM_HTML_MODE_LEGACY
         )
         holder.cardId.text = currentItem.id.toString()
-
         holder.cardUpdateTime.text = "${updateTime[0]}\n${updateTime[1]}"
+        holder.groupCard.text = if (rvCardList[position].private) "" else "群組卡片"
+
+
         holder.bind(rvCardList[position].showTasks.toMutableList())
 
         holder.cvCard.setOnClickListener { clickCard.invoke(currentItem) }

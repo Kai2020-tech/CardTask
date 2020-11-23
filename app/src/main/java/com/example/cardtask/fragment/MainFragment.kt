@@ -263,6 +263,7 @@ class MainFragment : Fragment()
                 override fun onSuccess(call: Call<CardResponse>, response: Response<CardResponse>) {
                     val res = response.body()
                     cardList.clear()
+                    groupCardList.clear()
                     res?.userData?.showCards?.forEach { card ->
                         when (card.private) {
                             true -> cardList.add(card)

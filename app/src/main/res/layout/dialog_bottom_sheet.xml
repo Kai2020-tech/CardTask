@@ -17,9 +17,10 @@
         android:layout_marginEnd="8dp"
         android:background="@drawable/bg_shape"
         android:ems="10"
-        android:hint="請輸入使用者email以加入群組"
+        android:hint="請輸入使用者email 加入群組"
         android:inputType="textPersonName"
         android:paddingStart="8dp"
+        android:text="test321@test.com"
         app:layout_constraintEnd_toStartOf="@+id/btn_addUser"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
