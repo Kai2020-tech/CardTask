@@ -29,6 +29,7 @@ class MainFragment : Fragment()
     private lateinit var rootView: View
 
     private val edTaskRequestCode = 111
+    private val newTaskRequestCode = 555
     private val cardRequestCode = 456
 
     override fun onCreateView(
@@ -70,6 +71,11 @@ class MainFragment : Fragment()
                 showToast("Card item ${it.id}")
             }
 
+            longClickCard = {
+                delCard(it)
+                true
+            }
+
             taskClickListener = { showTask ->           //點擊task,到編輯task頁面,add EdTaskFragment
                 Log.i("card fragment", "showTask")
                 showToast("task item $showTask")
@@ -105,6 +111,11 @@ class MainFragment : Fragment()
                 showToast("Card item ${it.id}")
             }
 
+            longClickCard = {
+                delGroupCard(it)
+                true
+            }
+
             taskClickListener = { showTask ->           //點擊task,到編輯task頁面,add EdTaskFragment
                 Log.i("card fragment", "showTask")
                 showToast("task item $showTask")
@@ -135,8 +146,8 @@ class MainFragment : Fragment()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == cardRequestCode || requestCode == edTaskRequestCode) {
-            cardAdapter.update(cardList)
-            groupCardAdapter.update(groupCardList)
+//            getCards()
+           displayCard()
 //            val pos = data?.getIntExtra("pos", 0) ?: return
 //            cardAdapter.notifyItemChanged(pos)
         }
@@ -268,27 +279,8 @@ class MainFragment : Fragment()
             })
     }
 
-    private fun goToCard(position: Int) {
-        Log.d("card position", "$position")
-        val cardFragment = CardFragment()
-//                    fragment傳遞資料要使用系統的arguments
-        cardFragment.arguments = Bundle().apply {
-            putInt("pos", position)
-            putInt("id", cardList[position].id)
-            putBoolean("private", cardList[position].private)
-        }
-        /**將此fragment設爲target,接受回來的資料*/
-        cardFragment.setTargetFragment(this, cardRequestCode)
 
-        requireFragmentManager().beginTransaction().apply {
-            setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-            add(R.id.frame_layout, cardFragment)
-            addToBackStack("edCardFragment")
-            commit()
-        }
-    }
-
-    private fun goToCard(card: CardResponse.UserData.ShowCard) {
+    private fun goToCard(card: CardResponse.UserData.ShowCard) {    //參數設爲明確的card,無論哪個recyclerView都可正確
         Log.d("card id", "${card.id}")
         val cardFragment = CardFragment()
 //                    fragment傳遞資料要使用系統的arguments
@@ -309,10 +301,10 @@ class MainFragment : Fragment()
         }
     }
 
-    private fun delCard(position: Int) {
-        val delBuild = AlertDialog.Builder(activity)
-        val cardName = cardList[position].cardName
-        val cardId = cardList[position].id
+    private fun delCard(card: CardResponse.UserData.ShowCard) {
+        val delBuild = AlertDialog.Builder(activity,R.style.delCardDialogTheme)  //自訂dialog背景色
+        val cardName = card.cardName
+        val cardId = card.id
         delBuild
             .setTitle("確認要刪除卡片 [$cardName]?")
             .setPositiveButton("刪除") { _, _ ->
@@ -321,8 +313,29 @@ class MainFragment : Fragment()
                         override fun onSuccess(call: Call<DeleteCardResponse>, response: Response<DeleteCardResponse>) {
                             showToast("卡片 [$cardName] 已刪除")
                             Log.d("Success!", "Delete Card OK")
-                            cardList.removeAt(position)
+                            cardList.remove(card)
                             cardAdapter.update(cardList)
+                        }
+                    })
+            }
+            .setNegativeButton("取消") { _, _ -> }
+            .show()
+    }
+
+    private fun delGroupCard(card: CardResponse.UserData.ShowCard) {
+        val delBuild = AlertDialog.Builder(activity,R.style.delGroupCardDialogTheme)
+        val cardName = card.cardName
+        val cardId = card.id
+        delBuild
+            .setTitle("確認要刪除群組卡片 [$cardName]?")
+            .setPositiveButton("刪除") { _, _ ->
+                Api.retrofitService.deleteCard(token, cardId)
+                    .enqueue(object : MyCallback<DeleteCardResponse>() {
+                        override fun onSuccess(call: Call<DeleteCardResponse>, response: Response<DeleteCardResponse>) {
+                            showToast("卡片 [$cardName] 已刪除")
+                            Log.d("Success!", "Delete Card OK")
+                            groupCardList.remove(card)
+                            groupCardAdapter.update(groupCardList)
                         }
                     })
             }
@@ -415,4 +428,45 @@ class MainFragment : Fragment()
             }
         }
     }
+
+//    private fun goToCard(position: Int) {   //以card list的位置傳入時,若有多個card recyclerView,可能會到不正確的card
+//        Log.d("card position", "$position")
+//        val cardFragment = CardFragment()
+////                    fragment傳遞資料要使用系統的arguments
+//        cardFragment.arguments = Bundle().apply {
+//            putInt("pos", position)
+//            putInt("id", cardList[position].id)
+//            putBoolean("private", cardList[position].private)
+//        }
+//        /**將此fragment設爲target,接受回來的資料*/
+//        cardFragment.setTargetFragment(this, cardRequestCode)
+//
+//        requireFragmentManager().beginTransaction().apply {
+//            setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+//            add(R.id.frame_layout, cardFragment)
+//            addToBackStack("edCardFragment")
+//            commit()
+//        }
+//    }
+//
+//    private fun delCard(position: Int) {        //同goToCard()
+//        val delBuild = AlertDialog.Builder(activity)
+//        val cardName = cardList[position].cardName
+//        val cardId = cardList[position].id
+//        delBuild
+//            .setTitle("確認要刪除卡片 [$cardName]?")
+//            .setPositiveButton("刪除") { _, _ ->
+//                Api.retrofitService.deleteCard(token, cardId)
+//                    .enqueue(object : MyCallback<DeleteCardResponse>() {
+//                        override fun onSuccess(call: Call<DeleteCardResponse>, response: Response<DeleteCardResponse>) {
+//                            showToast("卡片 [$cardName] 已刪除")
+//                            Log.d("Success!", "Delete Card OK")
+//                            cardList.removeAt(position)
+//                            cardAdapter.update(cardList)
+//                        }
+//                    })
+//            }
+//            .setNegativeButton("取消") { _, _ -> }
+//            .show()
+//    }
 }

@@ -32,3 +32,23 @@ data class UserGroupResponse(
         )
     }
 }
+
+data class AddUserResponse(
+    @SerializedName("group_data")
+    val groupData: GroupData = GroupData(),
+    @SerializedName("status")
+    val status: Boolean = false // true
+) {
+    data class GroupData(
+        @SerializedName("card_id")
+        val cardId: String = "", // 1
+        @SerializedName("created_at")
+        val createdAt: String = "", // 2020-09-21T08:44:05.000000Z
+        @SerializedName("id")
+        val id: Int = 0, // 19
+        @SerializedName("updated_at")
+        val updatedAt: String = "", // 2020-09-21T08:44:05.000000Z
+        @SerializedName("users_id")
+        val usersId: Int = 0 // 2
+    )
+}

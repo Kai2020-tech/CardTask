@@ -69,7 +69,9 @@ class RvTaskAdapter() : RecyclerView.Adapter<RvTaskAdapter.ViewHolder>() {
         holder.taskColor.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, colorNum))
         holder.cvTask.setOnClickListener { listener.invoke(currentItem) }
         holder.cvTask.setOnLongClickListener {
+            //用於card fragment
             longClickListener.invoke(position)
+            //用於main fragment
             taskLongClick.invoke(rvTaskList[position])
         }
 

@@ -89,6 +89,14 @@ interface ApiService {
         @Header("userToken") userToken: String,
         @Path("id") id: Int
     ): Call<DeleteTaskResponse>
+
+    //卡片加入使用者
+    @POST("groups/{cardId}")
+    fun addUser(
+        @Header("userToken") userToken: String,
+        @Path("cardId") card_id: Int,
+        @Body email: AddUser
+    ): Call<AddUserResponse>
 }
 
 object Api {

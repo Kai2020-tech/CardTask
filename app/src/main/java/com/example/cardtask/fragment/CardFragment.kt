@@ -131,13 +131,19 @@ class CardFragment : Fragment() {
             val bottomSheetDialog = BottomSheetDialog(requireContext())
             val bsView: View = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_bottom_sheet, null)
             bottomSheetDialog.setContentView(bsView)
-            //設爲透明無效
             val parent = bsView.parent as ViewGroup //取得BottomSheet介面設定
             parent.setBackgroundResource(android.R.color.transparent) //將背景設為透明，否則預設白底
 
 //            (bsView.parent as ViewGroup?)?.background = ColorDrawable(Color.TRANSPARENT)
-//            bottomSheetDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))  //設爲透明無效
             bottomSheetDialog.show()
+//          關閉bottom sheet
+            bottomSheetDialog.btn_closeBottomSheet.setOnClickListener {
+                bottomSheetDialog.dismiss()
+            }
+            bottomSheetDialog.btn_addUser.setOnClickListener {
+                val email =AddUser(bottomSheetDialog.ed_userEmail.text.toString())
+                addUser(email)
+            }
 
             //        users recyclerView
             usersAdapter = RvUsersAdapter(this)
@@ -166,6 +172,7 @@ class CardFragment : Fragment() {
 
                 override fun onResponse(call: Call<UserGroupResponse>, response: Response<UserGroupResponse>) {
                     if (response.isSuccessful) {
+                        userList.clear()
                         val res = response.body()
                         Log.d("Success!", "$res")
                         res?.usersData?.forEach {
@@ -201,14 +208,14 @@ class CardFragment : Fragment() {
             })
     }
 
-    private fun updateCards(res: CardResponse?){
+    private fun updateCards(res: CardResponse?) {
         cardList.clear()
         groupCardList.clear()
         res?.userData?.showCards?.forEach { card ->
-            if(card.id== this.cardId){  //新增task後,檢查此張card id,並更新顯示之task
+            if (card.id == this.cardId) {  //新增task後,檢查此張card id,並更新顯示之task
                 this.card = card
-                displayTasksOfCard()
                 tasks = card.showTasks.toMutableList()
+                displayTasksOfCard()
             }
 
             when (card.private) {
@@ -263,6 +270,7 @@ class CardFragment : Fragment() {
 
     private fun delTask(position: Int) {     //刪除task
         val delBuild = AlertDialog.Builder(activity)
+
         delBuild
             .setTitle("確認要刪除Task [${tasks[position].title}]?")
             .setPositiveButton("刪除") { _, _ ->
@@ -274,13 +282,30 @@ class CardFragment : Fragment() {
                             cardList.forEach {
                                 it.showTasks.remove(tasks[position])
                             }
+                            groupCardList.forEach {
+                                it.showTasks.remove(tasks[position])
+                            }
                             tasks.removeAt(position)
                             taskAdapter.update(tasks)
+                            // 刪除task也要通知MainFragment更新
+                            val intent = Intent()
+//                            intent.putExtra("pos", cardPosition)
+                            targetFragment?.onActivityResult(cardRequestCode, Activity.RESULT_OK, intent)
                         }
                     })
             }
             .setNegativeButton("取消") { _, _ ->
             }
             .show()
+    }
+
+    private fun addUser(email: AddUser){
+        Api.retrofitService.addUser(token,cardId,email)
+            .enqueue(object :MyCallback<AddUserResponse>(){
+                override fun onSuccess(call: Call<AddUserResponse>, response: Response<AddUserResponse>) {
+                    getUsers()
+                    showToast("使用者已加入")
+                }
+            })
     }
 }

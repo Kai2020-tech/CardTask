@@ -30,4 +30,12 @@
         <item name="android:padding">8dp</item>
     </style>
 
+    <style name="delCardDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">#FFCCBC</item>
+    </style>
+
+    <style name="delGroupCardDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">#FFE0B2</item>
+    </style>
+
 </resources>

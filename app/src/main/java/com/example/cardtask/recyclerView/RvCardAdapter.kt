@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +20,7 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
     private var cardLongClick: ILongClickListener? = null
 
     var clickCard: (CardResponse.UserData.ShowCard) -> Unit = {}
+    var longClickCard: (CardResponse.UserData.ShowCard) -> Boolean = { true }
 
     var taskClickListener: (CardResponse.UserData.ShowCard.ShowTask) -> Unit = {}
     var taskLongClickListener: (CardResponse.UserData.ShowCard.ShowTask) -> Boolean = { true }
@@ -34,7 +36,7 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
         , View.OnLongClickListener
 //        ,RvTaskAdapter.IClickListener /*** 要實作RvTaskAdapter.IClickListener*/
     {
-        val cvCard = itemView.cv_card
+        val cvCard: ConstraintLayout = itemView.cv_card
         val cardName: TextView = itemView.tv_cardTitle
         val cardId: TextView = itemView.tv_cardId
         val cardUpdateTime: TextView = itemView.tv_update_time
@@ -103,6 +105,7 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
         holder.bind(rvCardList[position].showTasks.toMutableList())
 
         holder.cvCard.setOnClickListener { clickCard.invoke(currentItem) }
+        holder.cvCard.setOnLongClickListener { longClickCard.invoke(currentItem) }
     }
 
     fun update(updateCard: MutableList<CardResponse.UserData.ShowCard>) {
