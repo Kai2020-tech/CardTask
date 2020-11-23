@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import com.example.cardtask.*
 import com.example.cardtask.api.*
 import com.example.cardtask.recyclerView.RvCardAdapter
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_new_card.view.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.fragment_main.view.*
@@ -26,6 +25,7 @@ class MainFragment : Fragment()
 //    ,RvCardAdapter.ILongClickListener
 {
     private lateinit var cardAdapter: RvCardAdapter
+    private lateinit var groupCardAdapter: RvCardAdapter
     private lateinit var rootView: View
 
     private val edTaskRequestCode = 111
@@ -50,19 +50,25 @@ class MainFragment : Fragment()
         )
 
         getCards()
+
         cardAdapter = RvCardAdapter()
         rootView.rv_privateCard.adapter = cardAdapter.apply {
-            setCardClickListener(object : RvCardAdapter.IClickListener {
-                override fun click(position: Int) {     //點擊卡片,到編輯頁面,add EdCareFragment
-                    showToast("Item $position clicked")
-                    goToEdCard(position)
-                }
-            }, object : RvCardAdapter.ILongClickListener {
-                override fun longClick(position: Int) { //長點擊卡片,出現刪除卡片對話窗
-                    showToast("Item $position clicked")
-                    delCard(position)
-                }
-            })
+//            setCardClickListener(object : RvCardAdapter.IClickListener {
+//                override fun click(position: Int) {     //點擊卡片,到編輯頁面,add EdCareFragment
+//                    showToast("Item $position clicked")
+//                    goToCard(position)
+//                }
+//            }, object : RvCardAdapter.ILongClickListener {
+//                override fun longClick(position: Int) { //長點擊卡片,出現刪除卡片對話窗
+//                    showToast("Item $position clicked")
+//                    delCard(position)
+//                }
+//            })
+
+            clickCard = {
+                goToCard(it)
+                showToast("Card item ${it.id}")
+            }
 
             taskClickListener = { showTask ->           //點擊task,到編輯task頁面,add EdTaskFragment
                 Log.i("card fragment", "showTask")
@@ -80,6 +86,40 @@ class MainFragment : Fragment()
 //            setCardClickListener(clickListener, longClickListener)
         }
 
+        groupCardAdapter = RvCardAdapter()
+        rootView.rv_groupCard.adapter = groupCardAdapter.apply {
+//            setCardClickListener(object : RvCardAdapter.IClickListener {
+//                override fun click(position: Int) {     //點擊卡片,到編輯頁面,add EdCareFragment
+//                    showToast("Item $position clicked")
+//                    goToCard(position)
+//                }
+//            }, object : RvCardAdapter.ILongClickListener {
+//                override fun longClick(position: Int) { //長點擊卡片,出現刪除卡片對話窗
+//                    showToast("Item $position clicked")
+//                    delCard(position)
+//                }
+//            })
+
+            clickCard = {
+                goToCard(it)
+                showToast("Card item ${it.id}")
+            }
+
+            taskClickListener = { showTask ->           //點擊task,到編輯task頁面,add EdTaskFragment
+                Log.i("card fragment", "showTask")
+                showToast("task item $showTask")
+                goToEdTask(showTask)
+
+            }
+            taskLongClickListener = { showTask ->       //長點擊Task,出現刪除Task對話窗
+                delGroupTask(showTask)
+                true
+                /*if(){ true} else{ false}*/
+            }
+
+//            val (clickListener, longClickListener) = generateRvCardAdapterListener()
+//            setCardClickListener(clickListener, longClickListener)
+        }
         setRvLayout()
 
         newCardFab()
@@ -96,6 +136,7 @@ class MainFragment : Fragment()
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == cardRequestCode || requestCode == edTaskRequestCode) {
             cardAdapter.update(cardList)
+            groupCardAdapter.update(groupCardList)
 //            val pos = data?.getIntExtra("pos", 0) ?: return
 //            cardAdapter.notifyItemChanged(pos)
         }
@@ -172,6 +213,7 @@ class MainFragment : Fragment()
 
     companion object {
         val cardList = mutableListOf<CardResponse.UserData.ShowCard>()
+        val groupCardList = mutableListOf<CardResponse.UserData.ShowCard>()
         const val CAMERA_REQUEST_CODE = 100
         const val GALLERY_REQUEST_CODE = 200
     }
@@ -190,13 +232,18 @@ class MainFragment : Fragment()
 
     private fun updateCards(res: CardResponse?) {
         cardList.clear()
+        groupCardList.clear()
         res?.userData?.showCards?.forEach { card ->
-            cardList.add(card)
+            when (card.private) {
+                true -> cardList.add(card)
+                else -> groupCardList.add(card)
+            }
         }
     }
 
     private fun displayCard() {
         cardAdapter.update(cardList)
+        groupCardAdapter.update(groupCardList)
     }
 
     private fun getCardsScrollToPosition() {  //取得所有資料後,捲動到最新的卡片
@@ -206,30 +253,57 @@ class MainFragment : Fragment()
                     val res = response.body()
                     cardList.clear()
                     res?.userData?.showCards?.forEach { card ->
-                        cardList.add(card)
+                        when (card.private) {
+                            true -> cardList.add(card)
+                            else -> groupCardList.add(card)
+                        }
                         Log.d("card", "$cardList")
                     }
                     Log.d("Success!", "getCard OK")
                     cardAdapter.update(cardList)
+                    groupCardAdapter.update(groupCardList)
+
                     rootView.rv_privateCard.smoothScrollToPosition(cardList.size)
                 }
             })
     }
 
-    private fun goToEdCard(position: Int) {
-        val edCardFragment = CardFragment()
+    private fun goToCard(position: Int) {
+        Log.d("card position", "$position")
+        val cardFragment = CardFragment()
 //                    fragment傳遞資料要使用系統的arguments
-        edCardFragment.arguments = Bundle().apply {
+        cardFragment.arguments = Bundle().apply {
             putInt("pos", position)
             putInt("id", cardList[position].id)
             putBoolean("private", cardList[position].private)
         }
         /**將此fragment設爲target,接受回來的資料*/
-        edCardFragment.setTargetFragment(this, cardRequestCode)
+        cardFragment.setTargetFragment(this, cardRequestCode)
 
         requireFragmentManager().beginTransaction().apply {
             setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-            add(R.id.frame_layout, edCardFragment)
+            add(R.id.frame_layout, cardFragment)
+            addToBackStack("edCardFragment")
+            commit()
+        }
+    }
+
+    private fun goToCard(card: CardResponse.UserData.ShowCard) {
+        Log.d("card id", "${card.id}")
+        val cardFragment = CardFragment()
+//                    fragment傳遞資料要使用系統的arguments
+        cardFragment.arguments = Bundle().apply {
+            putParcelable("card", card)
+//            putInt("pos", position)
+            putInt("id", card.id)
+            putBoolean("private", card.private)
+        }
+        /**將此fragment設爲target,接受回來的資料*/
+        cardFragment.setTargetFragment(this, cardRequestCode)
+
+        requireFragmentManager().beginTransaction().apply {
+            setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+            add(R.id.frame_layout, cardFragment)
             addToBackStack("edCardFragment")
             commit()
         }
@@ -277,10 +351,35 @@ class MainFragment : Fragment()
             .show()
     }
 
+    private fun delGroupTask(showTask: CardResponse.UserData.ShowCard.ShowTask) {
+        val delBuild = AlertDialog.Builder(activity)
+        delBuild.setTitle("確認要刪除Task [${showTask.title}]?")
+            .setPositiveButton("刪除") { _, _ ->
+                Api.retrofitService.deleteTask(token, showTask.id)
+                    .enqueue(object : MyCallback<DeleteTaskResponse>() {
+                        override fun onSuccess(
+                            call: Call<DeleteTaskResponse>, response: Response<DeleteTaskResponse>
+                        ) {
+                            groupCardList.forEach {
+                                it.showTasks.remove(showTask)
+                            }
+                            groupCardAdapter.update(groupCardList)
+                        }
+                    })
+            }
+            .setNegativeButton("取消") { _, _ ->
+            }
+            .show()
+    }
+
     private fun setRvLayout() {     //將recyclerview接上,設置佈局水平方式
         rootView.rv_privateCard.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         LinearSnapHelper().attachToRecyclerView(rootView.rv_privateCard)     //recyclerview捲動停止時,可以讓item位於畫面中間
+
+        rootView.rv_groupCard.layoutManager =
+            LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+        LinearSnapHelper().attachToRecyclerView(rootView.rv_groupCard)     //recyclerview捲動停止時,可以讓item位於畫面中間
     }
 
     private fun newCardFab() {

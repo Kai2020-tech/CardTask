@@ -18,6 +18,8 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
     private var cardClick: IClickListener? = null
     private var cardLongClick: ILongClickListener? = null
 
+    var clickCard: (CardResponse.UserData.ShowCard) -> Unit = {}
+
     var taskClickListener: (CardResponse.UserData.ShowCard.ShowTask) -> Unit = {}
     var taskLongClickListener: (CardResponse.UserData.ShowCard.ShowTask) -> Boolean = { true }
 
@@ -32,6 +34,7 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
         , View.OnLongClickListener
 //        ,RvTaskAdapter.IClickListener /*** 要實作RvTaskAdapter.IClickListener*/
     {
+        val cvCard = itemView.cv_card
         val cardName: TextView = itemView.tv_cardTitle
         val cardId: TextView = itemView.tv_cardId
         val cardUpdateTime: TextView = itemView.tv_update_time
@@ -89,7 +92,7 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentItem = rvCardList[position]
         val underLineText = "<b><u>${currentItem.cardName}</>"   //控制文字樣式b粗體,i斜體,u底線
-        val updateTime = currentItem.updatedAt.split("T",".")
+        val updateTime = currentItem.updatedAt.split("T", ".")
         holder.cardName.text = HtmlCompat.fromHtml(
             underLineText,
             HtmlCompat.FROM_HTML_MODE_LEGACY
@@ -98,6 +101,8 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
 
         holder.cardUpdateTime.text = "${updateTime[0]}\n${updateTime[1]}"
         holder.bind(rvCardList[position].showTasks.toMutableList())
+
+        holder.cvCard.setOnClickListener { clickCard.invoke(currentItem) }
     }
 
     fun update(updateCard: MutableList<CardResponse.UserData.ShowCard>) {

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cardtask.R
 import com.example.cardtask.api.*
 import com.example.cardtask.fragment.MainFragment.Companion.cardList
+import com.example.cardtask.fragment.MainFragment.Companion.groupCardList
 import com.example.cardtask.goToEdTask
 import com.example.cardtask.hideKeyboard
 import com.example.cardtask.recyclerView.RvTaskAdapter
@@ -54,15 +55,17 @@ class CardFragment : Fragment() {
     var cardPosition = 0
     var cardId = 0
     var userList = mutableListOf<UserGroupResponse.UsersData>()
+    var card = CardResponse.UserData.ShowCard()
     var isPrivate = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
+            card = it.getParcelable<CardResponse.UserData.ShowCard>("card")!!
+            cardId = card.id
+            isPrivate = card.private
             cardPosition = it.getInt("pos")
-            cardId = it.getInt("id")
-            isPrivate = it.getBoolean("private")
         }
     }
 
@@ -87,9 +90,12 @@ class CardFragment : Fragment() {
         getCards()
         getUsers()
 
-        rootView.ed_cardName.setText(cardList[cardPosition].cardName)
-//        task recyclerView
-        tasks = cardList[cardPosition].showTasks.toMutableList()
+//        rootView.ed_cardName.setText(cardList[cardPosition].cardName)
+        rootView.ed_cardName.setText(card.cardName)
+
+//        產生task recyclerView
+//        tasks = cardList[cardPosition].showTasks.toMutableList()
+        tasks = card.showTasks.toMutableList()
         taskAdapter = RvTaskAdapter()
 
         rootView.ed_rvTask.adapter = taskAdapter    //將task recyclerview接上
@@ -119,7 +125,7 @@ class CardFragment : Fragment() {
             cardRename()
         }
 
-//  編輯使用者,開啓bottom sheet
+//  編輯使用者,開啓bottom sheet,建立user recyclerView
         rootView.btn_editUsers.setOnClickListener {
 
             val bottomSheetDialog = BottomSheetDialog(requireContext())
@@ -185,7 +191,7 @@ class CardFragment : Fragment() {
                     if (response.isSuccessful) {
                         Log.d("Success!", "getCard OK")
                         updateCards(response.body())
-                        displayTasksOfCard()
+//                        displayTasksOfCard()
 
                         val intent = Intent()
                         intent.putExtra("pos", cardPosition)
@@ -195,16 +201,30 @@ class CardFragment : Fragment() {
             })
     }
 
-    private fun updateCards(res: CardResponse?) {
+    private fun updateCards(res: CardResponse?){
         cardList.clear()
+        groupCardList.clear()
         res?.userData?.showCards?.forEach { card ->
-            cardList.add(card)
+            if(card.id== this.cardId){  //新增task後,檢查此張card id,並更新顯示之task
+                this.card = card
+                displayTasksOfCard()
+                tasks = card.showTasks.toMutableList()
+            }
+
+            when (card.private) {
+                true -> cardList.add(card)
+                else -> groupCardList.add(card)
+            }
         }
+
     }
 
     private fun displayTasksOfCard() {
-        taskAdapter.update(cardList[cardPosition].showTasks.toMutableList())
+//        taskAdapter.update(cardList[cardPosition].showTasks.toMutableList())
+        taskAdapter.update(card.showTasks.toMutableList())
+//        taskAdapter.update(tasks)
     }
+
 
     private fun cardRename() {
         val newCard = NewCard()

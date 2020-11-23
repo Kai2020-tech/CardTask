@@ -26,6 +26,7 @@ data class CardResponse(
         @SerializedName("username")
         val username: String = "" // admin
     ) {
+        @Parcelize
         data class ShowCard(
             @SerializedName("card_name")
             var cardName: String = "", // hahaha
@@ -43,13 +44,14 @@ data class CardResponse(
             val showTasks: MutableList<ShowTask> = mutableListOf(),     //list改為mutableList
             @SerializedName("updated_at")
             val updatedAt: String = "" // 2020-09-04T16:17:53.000000Z
-        ) {
+        ):Parcelable {
+            @Parcelize
             data class Pivot(
                 @SerializedName("card_id")
                 val cardId: Int = 0, // 1
                 @SerializedName("users_id")
                 val usersId: Int = 0 // 1
-            )
+            ):Parcelable
 
             @Parcelize
             data class ShowTask(
