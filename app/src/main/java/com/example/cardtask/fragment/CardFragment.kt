@@ -3,14 +3,13 @@ package com.example.cardtask.fragment
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cardtask.R
 import com.example.cardtask.api.*
@@ -18,15 +17,15 @@ import com.example.cardtask.fragment.MainFragment.Companion.cardList
 import com.example.cardtask.fragment.MainFragment.Companion.groupCardList
 import com.example.cardtask.goToEdTask
 import com.example.cardtask.hideKeyboard
+import com.example.cardtask.itemTouch.ItemTouchHelperCallback
 import com.example.cardtask.recyclerView.RvTaskAdapter
-import com.example.cardtask.recyclerView.RvUsersAdapter
+import com.example.cardtask.recyclerView.RvUsersInterface
 import com.example.cardtask.showToast
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.dialog_bottom_sheet.*
 import kotlinx.android.synthetic.main.dialog_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.fragment_card.*
 import kotlinx.android.synthetic.main.fragment_card.view.*
-import kotlinx.android.synthetic.main.fragment_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,7 +46,7 @@ class CardFragment : Fragment() {
     private var bottomSheet: View? = null
 
     lateinit var taskAdapter: RvTaskAdapter
-    lateinit var usersAdapter: RvUsersAdapter
+    lateinit var usersAdapter: RvUsersInterface
     lateinit var tasks: MutableList<CardResponse.UserData.ShowCard.ShowTask>
     private val newTaskRequestCode = 555
     private val edTaskRequestCode = 111
@@ -89,7 +88,7 @@ class CardFragment : Fragment() {
 
         rootView.tv_EdCardId.text = cardId.toString()
         getCards()
-        getUsers()
+
 
 //        rootView.ed_cardName.setText(cardList[cardPosition].cardName)
         rootView.ed_cardName.setText(card.cardName)
@@ -138,10 +137,15 @@ class CardFragment : Fragment() {
             bottomSheetDialog.show()
 
 //        users recyclerView
-            usersAdapter = RvUsersAdapter(this)
+            usersAdapter = RvUsersInterface(this)
             bottomSheetDialog.rv_userOfCard.adapter = usersAdapter
             bottomSheetDialog.rv_userOfCard.layoutManager = LinearLayoutManager(activity)
-            usersAdapter.update(userList)
+            getUsers()  //取得,更新卡片使用者
+//        加入左右滑動
+            val callback = ItemTouchHelperCallback(usersAdapter)
+            val touchHelper = ItemTouchHelper(callback)
+            touchHelper.attachToRecyclerView(bottomSheetDialog.rv_userOfCard)
+
 //            關閉bottom sheet
             bottomSheetDialog.btn_closeBottomSheet.setOnClickListener {
                 bottomSheetDialog.dismiss()
@@ -151,7 +155,8 @@ class CardFragment : Fragment() {
             bottomSheetDialog.btn_addUser.setOnClickListener {
                 val email = AddUser(bottomSheetDialog.ed_userEmail.text.toString())
                 addUser(email)
-                updateUsers()
+//                updateUsers()
+                getUsers()
                 getCards()
 
                 hideKeyboard(tv_groupCard)
@@ -181,11 +186,12 @@ class CardFragment : Fragment() {
 
                 override fun onResponse(call: Call<UserGroupResponse>, response: Response<UserGroupResponse>) {
                     if (response.isSuccessful) {
-//                        userList.clear()
+                        userList.clear()
                         val res = response.body()
                         Log.d("Success!", "$res")
                         res?.usersData?.forEach {
                             userList.add(it)
+                            usersAdapter.update(userList)
                         }
                     }
                 }
@@ -335,7 +341,8 @@ class CardFragment : Fragment() {
             .enqueue(object : MyCallback<AddUserResponse>() {
                 override fun onSuccess(call: Call<AddUserResponse>, response: Response<AddUserResponse>) {
                     showToast("使用者已加入")
-                    updateUsers()
+//                    updateUsers()
+                    getUsers()
                 }
 
                 override fun notSuccess(call: Call<AddUserResponse>, response: Response<AddUserResponse>) {

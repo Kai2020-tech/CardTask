@@ -1,6 +1,5 @@
 package com.example.cardtask.recyclerView
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,12 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.cardtask.R
-import com.example.cardtask.api.CardResponse
 import com.example.cardtask.api.UserGroupResponse
-import kotlinx.android.synthetic.main.fragment_ed_task.view.*
+import com.example.cardtask.itemTouch.ItHelperInterface
 import kotlinx.android.synthetic.main.model_user.view.*
 
-class RvUsersAdapter(context: Fragment) : RecyclerView.Adapter<RvUsersAdapter.ViewHolder>() {
+class RvUsersInterface(context: Fragment) : RecyclerView.Adapter<RvUsersInterface.ViewHolder>(), ItHelperInterface {
 
     private var rvUserList = mutableListOf<UserGroupResponse.UsersData>()
     val context = context
@@ -26,7 +24,7 @@ class RvUsersAdapter(context: Fragment) : RecyclerView.Adapter<RvUsersAdapter.Vi
         val userPhoto: ImageView = itemView.img_model_userPhoto
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RvUsersAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RvUsersInterface.ViewHolder {
         val userView = LayoutInflater.from(parent.context).inflate(R.layout.model_user, parent, false)
         return ViewHolder(userView)
     }
@@ -48,5 +46,17 @@ class RvUsersAdapter(context: Fragment) : RecyclerView.Adapter<RvUsersAdapter.Vi
         rvUserList.clear()
         rvUserList.addAll(updateList)
         notifyDataSetChanged()
+    }
+
+    //  上下滑動
+    override fun onItemMove(fromPosition: Int, toPosition: Int) {
+        TODO("Not yet implemented")
+    }
+
+    //  左右滑動
+    override fun onItemDismiss(position: Int) {
+        rvUserList.removeAt(position)
+
+        notifyItemRemoved(position)
     }
 }

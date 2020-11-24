@@ -146,8 +146,8 @@ class MainFragment : Fragment()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == cardRequestCode || requestCode == edTaskRequestCode) {
-//            getCards()
-           displayCard()
+            getCards()
+//           displayCard()
 //            val pos = data?.getIntExtra("pos", 0) ?: return
 //            cardAdapter.notifyItemChanged(pos)
         }
