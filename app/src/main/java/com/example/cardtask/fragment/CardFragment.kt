@@ -153,6 +153,9 @@ class CardFragment : Fragment() {
                 addUser(email)
                 updateUsers()
                 getCards()
+
+                hideKeyboard(tv_groupCard)
+                bottomSheet?.ed_userEmail?.text?.clear()
             }
 
 
@@ -333,8 +336,6 @@ class CardFragment : Fragment() {
                 override fun onSuccess(call: Call<AddUserResponse>, response: Response<AddUserResponse>) {
                     showToast("使用者已加入")
                     updateUsers()
-                    hideKeyboard(tv_groupCard)
-                    bottomSheet?.ed_userEmail?.text?.clear()
                 }
 
                 override fun notSuccess(call: Call<AddUserResponse>, response: Response<AddUserResponse>) {
