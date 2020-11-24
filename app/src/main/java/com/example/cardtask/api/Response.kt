@@ -40,10 +40,7 @@ data class NewCard(
     var cardName: String = "" // card name
 )
 
-data class AddUser(
-    @SerializedName("email")
-    val email: String = "" // card name
-)
+
 
 
 

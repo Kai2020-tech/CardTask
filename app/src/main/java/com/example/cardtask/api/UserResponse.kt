@@ -1,4 +1,5 @@
 package com.example.cardtask.api
+
 import com.google.gson.annotations.SerializedName
 
 //查詢card的users
@@ -33,6 +34,12 @@ data class UserGroupResponse(
     }
 }
 
+// 群組卡片加入使用者
+data class AddUser(
+    @SerializedName("email")
+    val email: String = "" // card name
+)
+
 data class AddUserResponse(
     @SerializedName("group_data")
     val groupData: GroupData = GroupData(),
@@ -53,6 +60,16 @@ data class AddUserResponse(
     )
 }
 
+// 群組卡片刪除使用者
+data class DelUser(
+    @SerializedName("user_id")
+    val usersId: Int = 0 // 2
+)
+
+data class DelUserResponse(
+    @SerializedName("status")
+    val status: Boolean = false // true
+)
 
 data class AddUserFailResponse(
     @SerializedName("error")

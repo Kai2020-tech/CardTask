@@ -10,21 +10,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.cardtask.R
-import com.example.cardtask.api.UserGroupResponse
-import com.example.cardtask.itemTouch.ItHelperInterface
+import com.example.cardtask.api.*
+import com.example.cardtask.fragment.MainFragment.Companion.isUserDeleted
+import com.example.cardtask.itemTouch.IthHelperInterface
 import kotlinx.android.synthetic.main.model_user.view.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-class RvUsersInterface(context: Fragment) : RecyclerView.Adapter<RvUsersInterface.ViewHolder>(), ItHelperInterface {
+class RvUsersAdapter(val context: Fragment) : RecyclerView.Adapter<RvUsersAdapter.ViewHolder>(), IthHelperInterface {
 
     private var rvUserList = mutableListOf<UserGroupResponse.UsersData>()
-    val context = context
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val userName: TextView = itemView.tv_model_userName
         val userPhoto: ImageView = itemView.img_model_userPhoto
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RvUsersInterface.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RvUsersAdapter.ViewHolder {
         val userView = LayoutInflater.from(parent.context).inflate(R.layout.model_user, parent, false)
         return ViewHolder(userView)
     }
@@ -54,9 +57,24 @@ class RvUsersInterface(context: Fragment) : RecyclerView.Adapter<RvUsersInterfac
     }
 
     //  左右滑動
-    override fun onItemDismiss(position: Int) {
-        rvUserList.removeAt(position)
+    override fun onItemDismiss(position: Int,cardId:Int) {
+        val userId = DelUser(rvUserList[position].id)
 
-        notifyItemRemoved(position)
+        Api.retrofitService.delUser(token,cardId,userId)
+            .enqueue(object: Callback<DelUserResponse>{
+                override fun onFailure(call: Call<DelUserResponse>, t: Throwable) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponse(call: Call<DelUserResponse>, response: Response<DelUserResponse>) {
+                    if (response.isSuccessful) {
+                        rvUserList.removeAt(position)
+                        notifyItemRemoved(position)
+                        //將companion object isUserDeleted設爲true,讓bottom sheet dialog dismiss listener偵測
+                        isUserDeleted = true
+                    }
+                }
+            })
+
     }
 }

@@ -15,11 +15,12 @@ import com.example.cardtask.R
 import com.example.cardtask.api.*
 import com.example.cardtask.fragment.MainFragment.Companion.cardList
 import com.example.cardtask.fragment.MainFragment.Companion.groupCardList
+import com.example.cardtask.fragment.MainFragment.Companion.isUserDeleted
 import com.example.cardtask.goToEdTask
 import com.example.cardtask.hideKeyboard
 import com.example.cardtask.itemTouch.ItemTouchHelperCallback
 import com.example.cardtask.recyclerView.RvTaskAdapter
-import com.example.cardtask.recyclerView.RvUsersInterface
+import com.example.cardtask.recyclerView.RvUsersAdapter
 import com.example.cardtask.showToast
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.dialog_bottom_sheet.*
@@ -46,7 +47,7 @@ class CardFragment : Fragment() {
     private var bottomSheet: View? = null
 
     lateinit var taskAdapter: RvTaskAdapter
-    lateinit var usersAdapter: RvUsersInterface
+    lateinit var usersAdapter: RvUsersAdapter
     lateinit var tasks: MutableList<CardResponse.UserData.ShowCard.ShowTask>
     private val newTaskRequestCode = 555
     private val edTaskRequestCode = 111
@@ -135,14 +136,21 @@ class CardFragment : Fragment() {
             parent.setBackgroundResource(android.R.color.transparent) //將背景設為透明，否則預設白底
 //            (bsView.parent as ViewGroup?)?.background = ColorDrawable(Color.TRANSPARENT)
             bottomSheetDialog.show()
+//          當bottom sheet dismiss時,要進行的動作
+            bottomSheetDialog.setOnDismissListener {
+                if(isUserDeleted){
+                    getCards()
+                    isUserDeleted = false
+                }
+            }
 
 //        users recyclerView
-            usersAdapter = RvUsersInterface(this)
+            usersAdapter = RvUsersAdapter(this)
             bottomSheetDialog.rv_userOfCard.adapter = usersAdapter
             bottomSheetDialog.rv_userOfCard.layoutManager = LinearLayoutManager(activity)
             getUsers()  //取得,更新卡片使用者
 //        加入左右滑動
-            val callback = ItemTouchHelperCallback(usersAdapter)
+            val callback = ItemTouchHelperCallback(usersAdapter, cardId)
             val touchHelper = ItemTouchHelper(callback)
             touchHelper.attachToRecyclerView(bottomSheetDialog.rv_userOfCard)
 
@@ -151,12 +159,13 @@ class CardFragment : Fragment() {
                 bottomSheetDialog.dismiss()
                 bottomSheet = null
             }
-//            加入使用者
+
+//            確認加入使用者
             bottomSheetDialog.btn_addUser.setOnClickListener {
                 val email = AddUser(bottomSheetDialog.ed_userEmail.text.toString())
                 addUser(email)
 //                updateUsers()
-                getUsers()
+                getUsers()  //取得,更新卡片使用者
                 getCards()
 
                 hideKeyboard(tv_groupCard)
@@ -168,6 +177,7 @@ class CardFragment : Fragment() {
 //  Fab新增Task,開啓task fragment
         newTaskFab()
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == newTaskRequestCode || requestCode == edTaskRequestCode) {

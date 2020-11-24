@@ -97,6 +97,15 @@ interface ApiService {
         @Path("cardId") card_id: Int,
         @Body email: AddUser
     ): Call<AddUserResponse>
+
+    //卡片刪除使用者
+//    @DELETE("groups/{cardId}")
+    @HTTP(method = "DELETE", path = "groups/{cardId}", hasBody = true)
+    fun delUser(
+        @Header("userToken") userToken: String,
+        @Path("cardId") card_id: Int,
+        @Body userId: DelUser
+    ): Call<DelUserResponse>
 }
 
 object Api {

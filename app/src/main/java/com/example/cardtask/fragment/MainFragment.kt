@@ -225,6 +225,7 @@ class MainFragment : Fragment()
     companion object {
         val cardList = mutableListOf<CardResponse.UserData.ShowCard>()
         val groupCardList = mutableListOf<CardResponse.UserData.ShowCard>()
+        var isUserDeleted = false   //當card的bottom sheet user名單,有移除user時,改變爲true
         const val CAMERA_REQUEST_CODE = 100
         const val GALLERY_REQUEST_CODE = 200
     }

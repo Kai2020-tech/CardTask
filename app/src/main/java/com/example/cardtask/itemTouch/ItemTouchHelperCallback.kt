@@ -3,7 +3,7 @@ package com.example.cardtask.itemTouch
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
-class ItemTouchHelperCallback(private val mInterface: ItHelperInterface) : ItemTouchHelper.Callback() {
+class ItemTouchHelperCallback(private val mAdapter: IthHelperInterface,private val cardId:Int) : ItemTouchHelper.Callback() {
 
     override fun isItemViewSwipeEnabled(): Boolean {    //首先開啓item滑動
         return true
@@ -18,20 +18,22 @@ class ItemTouchHelperCallback(private val mInterface: ItHelperInterface) : ItemT
         val dragFlags = ItemTouchHelper.ACTION_STATE_IDLE
         return makeMovementFlags(dragFlags, swipeFlags)
     }
-//  上下移動
+
+    //  上下移動
     override fun onMove(
         recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
     ): Boolean {
-        mInterface.onItemMove(viewHolder.adapterPosition, target.adapterPosition)
+        mAdapter.onItemMove(viewHolder.adapterPosition, target.adapterPosition)
         return true
     }
- //  左右滑動
+
+    //  左右滑動
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        mInterface.onItemDismiss(viewHolder.adapterPosition)
+        mAdapter.onItemDismiss(viewHolder.adapterPosition,cardId)
     }
 }
 
-interface ItHelperInterface {  //讓recyclerView implement這個interface
-    fun onItemMove(fromPosition: Int, toPosition: Int)
-    fun onItemDismiss(position: Int)
+interface IthHelperInterface {  //讓recyclerView implement這個interface
+    fun onItemMove(fromPosition: Int, toPosition: Int)  //上下
+    fun onItemDismiss(position: Int,cardId: Int)    //左右
 }
