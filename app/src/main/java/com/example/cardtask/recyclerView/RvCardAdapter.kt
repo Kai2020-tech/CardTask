@@ -20,8 +20,8 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
     private var cardClick: IClickListener? = null
     private var cardLongClick: ILongClickListener? = null
 
-    var clickCard: (CardResponse.UserData.ShowCard) -> Unit = {}
-    var longClickCard: (CardResponse.UserData.ShowCard) -> Boolean = { true }
+    var cardClickListener: (CardResponse.UserData.ShowCard) -> Unit = {}
+    var cardLongClickListener: (CardResponse.UserData.ShowCard) -> Boolean = { true }
 
     var taskClickListener: (CardResponse.UserData.ShowCard.ShowTask) -> Unit = {}
     var taskLongClickListener: (CardResponse.UserData.ShowCard.ShowTask) -> Boolean = { true }
@@ -108,8 +108,8 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
 
         holder.bind(rvCardList[position].showTasks.toMutableList())
 
-        holder.cvCard.setOnClickListener { clickCard.invoke(currentItem) }
-        holder.cvCard.setOnLongClickListener { longClickCard.invoke(currentItem) }
+        holder.cvCard.setOnClickListener { v -> cardClickListener.invoke(currentItem) }
+        holder.cvCard.setOnLongClickListener { cardLongClickListener.invoke(currentItem) }
         //區分群組卡片顏色
         if (rvCardList[position].private){
             holder.cvCard.setBackgroundColor(Color.parseColor("#FFE0B2"))

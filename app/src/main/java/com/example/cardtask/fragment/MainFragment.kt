@@ -66,12 +66,12 @@ class MainFragment : Fragment()
 //                }
 //            })
 
-            clickCard = {
+            cardClickListener = {
                 goToCard(it)
                 showToast("Card item ${it.id}")
             }
 
-            longClickCard = {
+            cardLongClickListener = {
                 delCard(it)
                 true
             }
@@ -93,7 +93,29 @@ class MainFragment : Fragment()
         }
 
         groupCardAdapter = RvCardAdapter()
-        rootView.rv_groupCard.adapter = groupCardAdapter.apply {
+        groupCardAdapter.cardClickListener = {
+            goToCard(it)
+            showToast("Card item ${it.id}")
+        }
+
+        groupCardAdapter.cardLongClickListener = {
+            delGroupCard(it)
+            true
+        }
+
+        groupCardAdapter.taskClickListener = { showTask ->           //點擊task,到編輯task頁面,add EdTaskFragment
+            Log.i("card fragment", "showTask")
+            showToast("task item $showTask")
+            goToEdTask(showTask)
+
+        }
+        groupCardAdapter.taskLongClickListener = { showTask ->       //長點擊Task,出現刪除Task對話窗
+            delGroupTask(showTask)
+            true
+            /*if(){ true} else{ false}*/
+        }
+        rootView.rv_groupCard.adapter = groupCardAdapter
+            //.apply {
 //            setCardClickListener(object : RvCardAdapter.IClickListener {
 //                override fun click(position: Int) {     //點擊卡片,到編輯頁面,add EdCareFragment
 //                    showToast("Item $position clicked")
@@ -106,31 +128,11 @@ class MainFragment : Fragment()
 //                }
 //            })
 
-            clickCard = {
-                goToCard(it)
-                showToast("Card item ${it.id}")
-            }
 
-            longClickCard = {
-                delGroupCard(it)
-                true
-            }
-
-            taskClickListener = { showTask ->           //點擊task,到編輯task頁面,add EdTaskFragment
-                Log.i("card fragment", "showTask")
-                showToast("task item $showTask")
-                goToEdTask(showTask)
-
-            }
-            taskLongClickListener = { showTask ->       //長點擊Task,出現刪除Task對話窗
-                delGroupTask(showTask)
-                true
-                /*if(){ true} else{ false}*/
-            }
 
 //            val (clickListener, longClickListener) = generateRvCardAdapterListener()
 //            setCardClickListener(clickListener, longClickListener)
-        }
+       //}
         setRvLayout()
 
         newCardFab()

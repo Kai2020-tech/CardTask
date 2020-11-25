@@ -125,7 +125,7 @@ class CardFragment : Fragment() {
             hideKeyboard(tv_EdCardId)
             if (rootView.ed_cardName.text.isNotEmpty()) {
                 cardRename()
-            }else{
+            } else {
                 showToast("卡片名稱不能爲空")
             }
         }
@@ -157,13 +157,15 @@ class CardFragment : Fragment() {
             val callback = ItemTouchHelperCallback(usersAdapter, cardId)
             val touchHelper = ItemTouchHelper(callback)
             touchHelper.attachToRecyclerView(bottomSheetDialog.rv_userOfCard)
-
+//        刪除使用者
+            usersAdapter.onUserRemove = { userList: MutableList<UserGroupResponse.UsersData>, i: Int, userId: DelUser ->
+                delUser(userId = userId,rvUserList = userList,position = i)
+            }
 //            關閉bottom sheet
             bottomSheetDialog.btn_closeBottomSheet.setOnClickListener {
                 bottomSheetDialog.dismiss()
                 bottomSheet = null
             }
-
 //            確認加入使用者
             bottomSheetDialog.btn_addUser.setOnClickListener {
                 val email = AddUser(bottomSheetDialog.ed_userEmail.text.toString())
@@ -349,7 +351,7 @@ class CardFragment : Fragment() {
             }
             .show()
     }
-
+//加入使用者
     private fun addUser(email: AddUser) {
         Api.retrofitService.addUser(token, cardId, email)
             .enqueue(object : MyCallback<AddUserResponse>() {
@@ -361,6 +363,28 @@ class CardFragment : Fragment() {
 
                 override fun notSuccess(call: Call<AddUserResponse>, response: Response<AddUserResponse>) {
                     showToast("${response.errorBody()}")
+                }
+            })
+    }
+//刪除使用者
+    private fun delUser(
+        userId: DelUser,
+        rvUserList: MutableList<UserGroupResponse.UsersData>,
+        position: Int
+    ) {
+        Api.retrofitService.delUser(token, cardId, userId)
+            .enqueue(object : Callback<DelUserResponse> {
+                override fun onFailure(call: Call<DelUserResponse>, t: Throwable) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponse(call: Call<DelUserResponse>, response: Response<DelUserResponse>) {
+                    if (response.isSuccessful) {
+                        rvUserList.removeAt(position)
+                        usersAdapter.notifyItemRemoved(position)
+                        //將companion object isUserDeleted設爲true,讓bottom sheet dialog dismiss listener偵測
+                        isUserDeleted = true
+                    }
                 }
             })
     }
