@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cardtask.R
 import com.example.cardtask.api.CardResponse
 import kotlinx.android.synthetic.main.model_card.view.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
 
@@ -96,13 +98,19 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentItem = rvCardList[position]
         val underLineText = "<b><u>${currentItem.cardName}</>"   //控制文字樣式b粗體,i斜體,u底線
-        val updateTime = currentItem.updatedAt.split("T", ".")
         holder.cardName.text = HtmlCompat.fromHtml(
             underLineText,
             HtmlCompat.FROM_HTML_MODE_LEGACY
         )
+
+        val timeFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.TAIWAN)
+        timeFormatter.timeZone = TimeZone.getTimeZone("GMT")    //加這行才會將絕對時間+8小時
+        val updateTime = timeFormatter.parse(currentItem.updatedAt)
+        holder.cardUpdateTime.text = timeFormatter.parse(currentItem.updatedAt).toString()
+//        val updateTime = currentItem.updatedAt.split("T", ".")
+//        holder.cardUpdateTime.text = "${updateTime[0]}\n${updateTime[1]}"
+
         holder.cardId.text = currentItem.id.toString()
-        holder.cardUpdateTime.text = "${updateTime[0]}\n${updateTime[1]}"
         holder.groupCard.text = if (rvCardList[position].private) "" else "群組卡片"
 
 
