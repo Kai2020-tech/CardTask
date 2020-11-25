@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.cardtask.api.Api
 import com.example.cardtask.api.CardResponse
 import com.example.cardtask.fragment.MainFragment
@@ -68,7 +69,7 @@ class SecondActivity : AppCompatActivity() {
                         if (res?.userData?.image.toString() != "null") {
                             Glide.with(this@SecondActivity)
                                 .load("https://storage.googleapis.com/gcs.gill.gq/${res?.userData?.image.toString()}")
-                                .into(userImage)
+                                .transform(CircleCrop()).into(userImage)
                         }
 //                        res?.userData?.showCards?.forEach { card ->
 //                            MainFragment.cardList.add(card)

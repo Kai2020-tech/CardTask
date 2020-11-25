@@ -123,7 +123,11 @@ class CardFragment : Fragment() {
 //  更新卡片名稱
         rootView.btn_cardUpdate.setOnClickListener {
             hideKeyboard(tv_EdCardId)
-            cardRename()
+            if (rootView.ed_cardName.text.isNotEmpty()) {
+                cardRename()
+            }else{
+                showToast("卡片名稱不能爲空")
+            }
         }
 
 //  編輯使用者,開啓bottom sheet,建立user recyclerView
@@ -138,7 +142,7 @@ class CardFragment : Fragment() {
             bottomSheetDialog.show()
 //          當bottom sheet dismiss時,要進行的動作
             bottomSheetDialog.setOnDismissListener {
-                if(isUserDeleted){
+                if (isUserDeleted) {
                     getCards()
                     isUserDeleted = false
                 }

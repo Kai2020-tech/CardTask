@@ -1,6 +1,7 @@
 package com.example.cardtask.recyclerView
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,7 +41,7 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
         val cardName: TextView = itemView.tv_cardTitle
         val cardId: TextView = itemView.tv_cardId
         val cardUpdateTime: TextView = itemView.tv_update_time
-        val groupCard = itemView.tv_groupCard
+        val groupCard: TextView = itemView.tv_groupCard
         private val rvTask: RecyclerView? = itemView.findViewById<RecyclerView>(R.id.rv_task)
         private val taskAdapter: RvTaskAdapter = RvTaskAdapter()/*.apply {
             setListener(object : RvTaskAdapter.IClickListener{
@@ -91,7 +92,7 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
         return rvCardList.size
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "ResourceAsColor")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentItem = rvCardList[position]
         val underLineText = "<b><u>${currentItem.cardName}</>"   //控制文字樣式b粗體,i斜體,u底線
@@ -109,6 +110,12 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
 
         holder.cvCard.setOnClickListener { clickCard.invoke(currentItem) }
         holder.cvCard.setOnLongClickListener { longClickCard.invoke(currentItem) }
+        //區分群組卡片顏色
+        if (rvCardList[position].private){
+            holder.cvCard.setBackgroundColor(Color.parseColor("#FFE0B2"))
+        }else{
+            holder.cvCard.setBackgroundColor(Color.parseColor("#FFAB91"))
+        }
     }
 
     fun update(updateCard: MutableList<CardResponse.UserData.ShowCard>) {
