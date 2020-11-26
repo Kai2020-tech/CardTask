@@ -39,7 +39,6 @@ class SecondActivity : AppCompatActivity() {
         val pref = SharedPreferences(this)
         val token = pref.getData()!!
 
-
         Log.e("UI", "drawler1 $drawerLayout")
         Log.e("UI", "drawler2 ${drawerLayout.navigation}")
         Log.e("UI", "drawler3 ${drawerLayout.navigation.getHeaderView(0)}")
@@ -68,7 +67,7 @@ class SecondActivity : AppCompatActivity() {
                     Toast.makeText(this, "home", Toast.LENGTH_LONG).show()
 //                    drawerLayout.closeDrawers()
                     //用Handler收drawer,可以smooth一點點
-                    Handler().postDelayed({drawerLayout.closeDrawer(GravityCompat.START)}, 200)
+                    Handler().postDelayed({ drawerLayout.closeDrawer(GravityCompat.START) }, 200)
                 }
 //                R.id.group1_1 -> {
 //                    changeFragment(it.title.toString(), Group1_1Fragment())
@@ -124,12 +123,20 @@ class SecondActivity : AppCompatActivity() {
         }
 //        }
     }
-//  覆寫 onOptionsItemSelected 漢堡選單按了才有功能
+
+    //  覆寫 onOptionsItemSelected 漢堡選單按了才有功能
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
-            //漢堡選單原生的id
-            R.id.home -> drawerLayout.openDrawer(GravityCompat.START)
+            //漢堡選單原生的id,注意前要加上android才會找到正確的R class
+            android.R.id.home -> {
+                drawerLayout.openDrawer(GravityCompat.START)
+//                Log.d("ham", "in")
+            }
         }
+//        Log.d("ham", "${item?.itemId}")
+//        Log.d("ham", "${android.R.id.home}")
+//        Log.d("ham", "${R.id.home}")
+
         return super.onOptionsItemSelected(item)
     }
 
