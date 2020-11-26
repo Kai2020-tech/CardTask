@@ -3,8 +3,10 @@ package com.example.cardtask
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.KeyEvent
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -37,8 +39,6 @@ class SecondActivity : AppCompatActivity() {
         val pref = SharedPreferences(this)
         val token = pref.getData()!!
 
-        // Set the toolbar
-        setSupportActionBar(toolbar)
 
         Log.e("UI", "drawler1 $drawerLayout")
         Log.e("UI", "drawler2 ${drawerLayout.navigation}")
@@ -50,6 +50,33 @@ class SecondActivity : AppCompatActivity() {
         val userName = navigation.getHeaderView(0).findViewById<TextView>(R.id.tv_userName)
         val userImage = navigation.getHeaderView(0).findViewById<ImageView>(R.id.img_user)
         val userEmail = navigation.getHeaderView(0).findViewById<TextView>(R.id.tv_userEmail)
+
+        val toggle = ActionBarDrawerToggle(
+            this, drawerLayout, toolbar,
+            R.string.drawer_open,
+            R.string.drawer_close
+        )
+
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+        // Set the toolbar
+        setSupportActionBar(toolbar)
+        navigation.setNavigationItemSelectedListener {
+            Toast.makeText(this, it.itemId.toString(), Toast.LENGTH_LONG).show()
+            when (it.itemId) {
+                R.id.action_home -> {
+                    Toast.makeText(this, "home", Toast.LENGTH_LONG).show()
+//                    drawerLayout.closeDrawers()
+                    //用Handler收drawer,可以smooth一點點
+                    Handler().postDelayed({drawerLayout.closeDrawer(GravityCompat.START)}, 200)
+                }
+//                R.id.group1_1 -> {
+//                    changeFragment(it.title.toString(), Group1_1Fragment())
+//                    drawer.closeDrawers()
+//                }
+            }
+            true
+        }
 
 
         logOut.setOnClickListener {
@@ -96,6 +123,14 @@ class SecondActivity : AppCompatActivity() {
             commit()
         }
 //        }
+    }
+//  覆寫 onOptionsItemSelected 漢堡選單按了才有功能
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            //漢堡選單原生的id
+            R.id.home -> drawerLayout.openDrawer(GravityCompat.START)
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {

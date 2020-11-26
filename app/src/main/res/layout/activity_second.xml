@@ -6,7 +6,7 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+<!--以下是第一個元件viewGroup,裡面可以再放多個其它view-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -46,9 +46,6 @@
                     android:textSize="30sp" />
 
             </androidx.appcompat.widget.Toolbar>
-
-
-
         </com.google.android.material.appbar.AppBarLayout>
 
         <FrameLayout
@@ -63,6 +60,7 @@
         </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+<!--以下是drawer選單,要放在第二個元件-->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation"
         android:layout_width="240dp"
