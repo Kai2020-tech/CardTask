@@ -9,8 +9,10 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.cardtask.api.Api
@@ -23,6 +25,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+
 val cardFragment = MainFragment()
 
 class SecondActivity : AppCompatActivity() {
@@ -33,16 +36,21 @@ class SecondActivity : AppCompatActivity() {
 
         val pref = SharedPreferences(this)
         val token = pref.getData()!!
-//        登出,清掉本地token,使用post,讓btn_logout這個button有時間產生
+
+        // Set the toolbar
+        setSupportActionBar(toolbar)
+
         Log.e("UI", "drawler1 $drawerLayout")
         Log.e("UI", "drawler2 ${drawerLayout.navigation}")
         Log.e("UI", "drawler3 ${drawerLayout.navigation.getHeaderView(0)}")
         Log.e("UI", "drawler4 ${drawerLayout.navigation.getHeaderView(0).btn_logout}")
 
-        /** 這些是drawerLayout中再下一層的view,要從最外層開始找*/
+        /** 這些是drawerLayout nav_header_mail中再下一層的view,要從最外層開始找*/
         val logOut = navigation.getHeaderView(0).findViewById<Button>(R.id.btn_logout)
         val userName = navigation.getHeaderView(0).findViewById<TextView>(R.id.tv_userName)
         val userImage = navigation.getHeaderView(0).findViewById<ImageView>(R.id.img_user)
+        val userEmail = navigation.getHeaderView(0).findViewById<TextView>(R.id.tv_userEmail)
+
 
         logOut.setOnClickListener {
             pref.delete()
@@ -70,6 +78,7 @@ class SecondActivity : AppCompatActivity() {
                             Glide.with(this@SecondActivity)
                                 .load("https://storage.googleapis.com/gcs.gill.gq/${res?.userData?.image.toString()}")
                                 .transform(CircleCrop()).into(userImage)
+                            userEmail.text = res?.userData?.email
                         }
 //                        res?.userData?.showCards?.forEach { card ->
 //                            MainFragment.cardList.add(card)
