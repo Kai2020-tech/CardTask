@@ -1,20 +1,21 @@
 package com.example.cardtask
 
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.KeyEvent
+import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.appcompat.widget.SearchView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.cardtask.api.Api
@@ -121,7 +122,9 @@ class SecondActivity : AppCompatActivity() {
             replace(R.id.frame_layout, cardFragment, "cardFragment")
             commit()
         }
-//        }
+//        } //...savedInstanceState
+
+
     }
 
     //  覆寫 onOptionsItemSelected 漢堡選單按了才有功能
@@ -138,6 +141,42 @@ class SecondActivity : AppCompatActivity() {
 //        Log.d("ham", "${R.id.home}")
 
         return super.onOptionsItemSelected(item)
+    }
+
+    //tool bar的search menu
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_search, menu)
+        val searchItem = menu?.findItem(R.id.action_search)
+        val settingItem = menu?.findItem(R.id.action_settings)
+        //setting選單
+        settingItem?.setOnMenuItemClickListener {
+            Toast.makeText(this@SecondActivity, "setting clicked", Toast.LENGTH_SHORT).show()
+            return@setOnMenuItemClickListener true
+        }
+
+
+        if (searchItem != null) {
+            val searchView = searchItem.actionView as SearchView
+            searchView.queryHint = "請輸入卡片或任務名稱"
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                //當search文字輸入完後,按下軟鍵盤搜尋鍵時的動作
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(searchView.windowToken, 0)  //搜尋後收鍵盤
+                    Toast.makeText(this@SecondActivity, "search clicked $query", Toast.LENGTH_SHORT).show()
+                    return true
+                }
+
+                //當search text改變時,即時的動作
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    if (newText!!.isNotEmpty()) {
+
+                    }
+                    return true
+                }
+            })
+        }
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
