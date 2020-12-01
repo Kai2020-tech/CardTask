@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.example.cardtask.*
+import com.example.cardtask.SecondActivity.Companion.totalCardList
 import com.example.cardtask.api.*
 import com.example.cardtask.recyclerView.RvCardAdapter
 import kotlinx.android.synthetic.main.dialog_new_card.view.*
@@ -236,24 +237,26 @@ class MainFragment : Fragment()
                 override fun onSuccess(call: Call<CardResponse>, response: Response<CardResponse>) {
                     val res = response.body()
                     updateCards(res)
-                    displayCard()
+                    displayUpdatedCards()
                     Log.d("Success!", "getCard OK")
                 }
             })
     }
 
-    private fun updateCards(res: CardResponse?) {
-        cardList.clear()
-        groupCardList.clear()
-        res?.userData?.showCards?.forEach { card ->
-            when (card.private) {
-                true -> cardList.add(card)
-                else -> groupCardList.add(card)
-            }
-        }
-    }
+//    private fun updateCards(res: CardResponse?) {
+//        cardList.clear()
+//        groupCardList.clear()
+//        totalCardList.clear()
+//        res?.userData?.showCards?.forEach { card ->
+//            totalCardList.add(card)
+//            when (card.private) {
+//                true -> cardList.add(card)
+//                else -> groupCardList.add(card)
+//            }
+//        }
+//    }
 
-    private fun displayCard() {
+    private fun displayUpdatedCards() {
         cardAdapter.update(cardList)
         groupCardAdapter.update(groupCardList)
     }

@@ -1,4 +1,5 @@
 package com.example.cardtask.api
+
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
@@ -43,15 +44,17 @@ data class CardResponse(
             @SerializedName("show_tasks")
             val showTasks: MutableList<ShowTask> = mutableListOf(),     //list改為mutableList
             @SerializedName("updated_at")
-            val updatedAt: String = "" // 2020-09-04T16:17:53.000000Z
-        ):Parcelable {
+            val updatedAt: String = "", // 2020-09-04T16:17:53.000000Z
+            @SerializedName("cardType")
+            val type: String = "cardType"   //給adapter判斷用
+        ) : Parcelable {
             @Parcelize
             data class Pivot(
                 @SerializedName("card_id")
                 val cardId: Int = 0, // 1
                 @SerializedName("users_id")
                 val usersId: Int = 0 // 1
-            ):Parcelable
+            ) : Parcelable
 
             @Parcelize
             data class ShowTask(
@@ -76,7 +79,9 @@ data class CardResponse(
                 @SerializedName("update_user")
                 val updateUser: String = "", // admin
                 @SerializedName("updated_at")
-                val updatedAt: String = "" // 2020-09-04T16:22:13.000000Z
+                val updatedAt: String = "", // 2020-09-04T16:22:13.000000Z
+                @SerializedName("taskType")
+                val type: String = "taskType"   //給adapter判斷用
             ) : Parcelable
         }
     }

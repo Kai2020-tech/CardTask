@@ -25,6 +25,7 @@ import com.example.cardtask.api.CardResponse
 import com.example.cardtask.fragment.MainFragment.Companion.CAMERA_REQUEST_CODE
 import com.example.cardtask.fragment.MainFragment.Companion.GALLERY_REQUEST_CODE
 import com.example.cardtask.fragment.EdTaskFragment
+import com.example.cardtask.fragment.MainFragment
 import kotlinx.android.synthetic.main.dialog_photo.view.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -41,6 +42,19 @@ fun hideKeyboard(view: View, nextFocusView: View = view.rootView) {
     imm.hideSoftInputFromWindow(view.windowToken, 0)
     view.clearFocus()
     nextFocusView.requestFocus()
+}
+
+ fun Fragment.updateCards(res: CardResponse?) {
+    MainFragment.cardList.clear()
+    MainFragment.groupCardList.clear()
+    SecondActivity.totalCardList.clear()
+    res?.userData?.showCards?.forEach { card ->
+        SecondActivity.totalCardList.add(card)
+        when (card.private) {
+            true -> MainFragment.cardList.add(card)
+            else -> MainFragment.groupCardList.add(card)
+        }
+    }
 }
 
 fun Fragment.getPhoto(activity: FragmentActivity?): File? {

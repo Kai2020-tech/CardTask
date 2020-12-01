@@ -14,13 +14,15 @@ import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.widget.SearchView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.cardtask.api.Api
 import com.example.cardtask.api.CardResponse
 import com.example.cardtask.fragment.MainFragment
+import com.example.cardtask.fragment.MainFragment.Companion.cardList
+import com.example.cardtask.fragment.MainFragment.Companion.groupCardList
+import com.example.cardtask.fragment.SearchResultFragment
 import kotlinx.android.synthetic.main.activity_second.*
 import kotlinx.android.synthetic.main.activity_second.view.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
@@ -29,9 +31,15 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-val cardFragment = MainFragment()
+val mainFragment = MainFragment()
+val searchResultFragment = SearchResultFragment()
 
 class SecondActivity : AppCompatActivity() {
+
+    companion object{
+//        val totalResultList =  ArrayList<Any>()
+        val totalCardList = mutableListOf<CardResponse.UserData.ShowCard>()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,12 +59,12 @@ class SecondActivity : AppCompatActivity() {
         val userImage = navigation.getHeaderView(0).findViewById<ImageView>(R.id.img_user)
         val userEmail = navigation.getHeaderView(0).findViewById<TextView>(R.id.tv_userEmail)
 
+        //以下側邊選單內容
         val toggle = ActionBarDrawerToggle(
             this, drawerLayout, toolbar,
             R.string.drawer_open,
             R.string.drawer_close
         )
-
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         // Set the toolbar
@@ -77,7 +85,7 @@ class SecondActivity : AppCompatActivity() {
             }
             true
         }
-
+        //以上側邊選單內容
 
         logOut.setOnClickListener {
             pref.delete()
@@ -107,10 +115,10 @@ class SecondActivity : AppCompatActivity() {
                                 .transform(CircleCrop()).into(userImage)
                             userEmail.text = res?.userData?.email
                         }
-//                        res?.userData?.showCards?.forEach { card ->
-//                            MainFragment.cardList.add(card)
-//                        }
-//                        Log.d("Success!", "getCard OK")
+                        res?.userData?.showCards?.forEach { card ->
+                            totalCardList.add(card)
+                        }
+                        Log.d("Success!", "get Total Card List OK")
                     } else {    //token失效 ,啓動MainActivity重新登入
                         pref.delete()
                         this@SecondActivity.finish()
@@ -119,7 +127,7 @@ class SecondActivity : AppCompatActivity() {
                 }
             })
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.frame_layout, cardFragment, "cardFragment")
+            replace(R.id.frame_layout, mainFragment, "cardFragment")
             commit()
         }
 //        } //...savedInstanceState
@@ -163,14 +171,49 @@ class SecondActivity : AppCompatActivity() {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(searchView.windowToken, 0)  //搜尋後收鍵盤
-                    Toast.makeText(this@SecondActivity, "search clicked $query", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(this@SecondActivity, "search clicked $query", Toast.LENGTH_SHORT).show()
+
+//                    val searchResultFragment = SearchResultFragment()
+                    val cardResultList = arrayListOf<CardResponse.UserData.ShowCard>()
+                    val taskResultList = arrayListOf<CardResponse.UserData.ShowCard.ShowTask>()
+
+//                    val groupCardResultList = mutableListOf<CardResponse.UserData.ShowCard>()
+                    if (!query.isNullOrEmpty()) {
+                        totalCardList.forEach { card ->
+                            if (card.cardName.contains(query)) {
+                                card.showTasks.clear()
+                                cardResultList.add(card)
+                            }
+                            card.showTasks.forEach {
+                                if (it.title.contains(query)) {
+                                    taskResultList.add(it)
+                                }
+                            }
+                        }
+                    }
+
+                    searchResultFragment.arguments = Bundle().apply {
+                        putParcelableArrayList("taskList", taskResultList)
+                        putParcelableArrayList("cardList", cardResultList)
+//                        putParcelableArrayList("totalList", totalResultList) //不能放ArrayList<Any>型態的物件進去
+                    }
+                    if (cardResultList.isNotEmpty() || taskResultList.isNotEmpty()) {
+                        supportFragmentManager.beginTransaction().apply {
+                            setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+                            replace(R.id.frame_layout, searchResultFragment, "searchResultFragment")
+                            addToBackStack("MainFragment")
+                            commit()
+                        }
+                    } else {
+                        Toast.makeText(this@SecondActivity, "$query 查無資料", Toast.LENGTH_SHORT).show()
+                    }
                     return true
                 }
 
                 //當search text改變時,即時的動作
                 override fun onQueryTextChange(newText: String?): Boolean {
                     if (newText!!.isNotEmpty()) {
-
+                        //這裡沒用到
                     }
                     return true
                 }

@@ -1,14 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/searchResultFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
     tools:context=".fragment.SearchResultFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <!--背景圖-->
+    <!--https://github.com/JastAir/Android-BackgroundChart?utm_source=android-arsenal.com&utm_medium=referral&utm_campaign=7561-->
 
-</FrameLayout>
+    <!-- TODO: Update blank fragment layout -->
+    <com.fdev.backgroundchart.GradientChart
+        android:id="@+id/gradientChart_searchResultFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:isBezier="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:minusColorEnd="#FFF176"
+        app:minusColorStart="#FFD54F"
+        app:plusColorEnd="#FFD54F"
+        app:plusColorStart="#FFD54F"
+        app:zoom="10" />
+
+    <TextView
+        android:id="@+id/tv_searchResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="搜尋結果"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_searchResult"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/gradientChart_searchResultFragment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_searchResult"
+        tools:listitem="@layout/model_search_result" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
