@@ -53,11 +53,11 @@ class CardFragment : Fragment() {
     private val edTaskRequestCode = 111
     private val cardRequestCode = 456
 
-    var cardPosition = 0
+//    var cardPosition = 0
     var cardId = 0
     var userList = mutableListOf<UserGroupResponse.UsersData>()
     var card = CardResponse.UserData.ShowCard()
-    var isPrivate = true
+    private var isPrivate = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +66,7 @@ class CardFragment : Fragment() {
             card = it.getParcelable<CardResponse.UserData.ShowCard>("card")!!
             cardId = card.id
             isPrivate = card.private
-            cardPosition = it.getInt("pos")
+//            cardPosition = it.getInt("pos")
         }
     }
 
@@ -254,7 +254,7 @@ class CardFragment : Fragment() {
 //                        displayTasksOfCard()
 
                         val intent = Intent()
-                        intent.putExtra("pos", cardPosition)
+//                        intent.putExtra("pos", cardPosition)
                         targetFragment?.onActivityResult(cardRequestCode, Activity.RESULT_OK, intent)
                     }
                 }
@@ -303,7 +303,7 @@ class CardFragment : Fragment() {
         btn_fabTask.setOnClickListener {
             val taskFragment = NewTaskFragment()
             taskFragment.arguments = Bundle().apply {
-                putInt("pos", cardPosition)
+//                putInt("pos", cardPosition)
                 putInt("id", cardId)
             }
             taskFragment.setTargetFragment(this, newTaskRequestCode)

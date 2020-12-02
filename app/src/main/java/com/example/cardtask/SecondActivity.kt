@@ -210,16 +210,11 @@ class SecondActivity : AppCompatActivity() {
                         val searchResultFragment = SearchResultFragment()
 
                         searchResultFragment.arguments = Bundle().apply {
-                            putParcelableArrayList("taskList", taskResultList)
+                            putParcelableArrayList("taskList", taskResultList)  //不能放ArrayList<Any>型態的物件進去
                             putParcelableArrayList("cardList", cardResultList)
                             putString("queryString", query)
-//                        putParcelableArrayList("totalList", totalResultList) //不能放ArrayList<Any>型態的物件進去
                         }
-//                        searchView.isIconified = true  //搜索輸入框是否是關閉,要關閉或可用searchItem.collapseActionView()
-                        //將search的editTextView的focus釋放掉,否則按back鍵返回時會因爲需要先進行收鍵盤的動作,
-                        //再按第二次才會back回上一頁,即使用程式先收起鍵盤,back鍵還是會因爲focus在search的editTextView,
-                        //而進行收鍵盤的動作,所以我們要在這邊clearFocus
-//                        searchView.clearFocus()
+
                         searchView.onActionViewCollapsed()
 
                         supportFragmentManager.popBackStack("MainFragment", POP_BACK_STACK_INCLUSIVE)
