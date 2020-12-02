@@ -15,6 +15,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.cardtask.api.Api
@@ -32,12 +33,12 @@ import retrofit2.Response
 
 
 val mainFragment = MainFragment()
-val searchResultFragment = SearchResultFragment()
+//val searchResultFragment = SearchResultFragment()
 
 class SecondActivity : AppCompatActivity() {
 
-    companion object{
-//        val totalResultList =  ArrayList<Any>()
+    companion object {
+        //        val totalResultList =  ArrayList<Any>()
         val totalCardList = mutableListOf<CardResponse.UserData.ShowCard>()
     }
 
@@ -94,6 +95,13 @@ class SecondActivity : AppCompatActivity() {
             startActivity(Intent(this@SecondActivity, MainActivity::class.java))
         }
 
+        data class Item(
+            val type: String,
+            val id: String, //card -> cardId, task ->taskId
+            val title: String
+        )
+
+
 //        if (savedInstanceState == null) {
         Toast.makeText(this, "TOKEN = $token", Toast.LENGTH_SHORT).show()
         Api.retrofitService.getCard(token)
@@ -114,6 +122,13 @@ class SecondActivity : AppCompatActivity() {
                                 .load("https://storage.googleapis.com/gcs.gill.gq/${res?.userData?.image.toString()}")
                                 .transform(CircleCrop()).into(userImage)
                             userEmail.text = res?.userData?.email
+                        }
+                        val items = res?.userData?.showCards?.map {
+//                            Item(
+//                                type = "card",
+//                                id = it.id,
+//                                ....
+//                            )
                         }
                         res?.userData?.showCards?.forEach { card ->
                             totalCardList.add(card)
@@ -162,7 +177,7 @@ class SecondActivity : AppCompatActivity() {
             return@setOnMenuItemClickListener true
         }
 
-
+        //search功能在這
         if (searchItem != null) {
             val searchView = searchItem.actionView as SearchView
             searchView.queryHint = "請輸入卡片或任務名稱"
@@ -171,9 +186,7 @@ class SecondActivity : AppCompatActivity() {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(searchView.windowToken, 0)  //搜尋後收鍵盤
-//                    Toast.makeText(this@SecondActivity, "search clicked $query", Toast.LENGTH_SHORT).show()
 
-//                    val searchResultFragment = SearchResultFragment()
                     val cardResultList = arrayListOf<CardResponse.UserData.ShowCard>()
                     val taskResultList = arrayListOf<CardResponse.UserData.ShowCard.ShowTask>()
 
@@ -181,7 +194,7 @@ class SecondActivity : AppCompatActivity() {
                     if (!query.isNullOrEmpty()) {
                         totalCardList.forEach { card ->
                             if (card.cardName.contains(query)) {
-                                card.showTasks.clear()
+//                                card.showTasks.clear()
                                 cardResultList.add(card)
                             }
                             card.showTasks.forEach {
@@ -192,18 +205,31 @@ class SecondActivity : AppCompatActivity() {
                         }
                     }
 
-                    searchResultFragment.arguments = Bundle().apply {
-                        putParcelableArrayList("taskList", taskResultList)
-                        putParcelableArrayList("cardList", cardResultList)
-//                        putParcelableArrayList("totalList", totalResultList) //不能放ArrayList<Any>型態的物件進去
-                    }
                     if (cardResultList.isNotEmpty() || taskResultList.isNotEmpty()) {
+                        searchItem.collapseActionView()
+                        val searchResultFragment = SearchResultFragment()
+
+                        searchResultFragment.arguments = Bundle().apply {
+                            putParcelableArrayList("taskList", taskResultList)
+                            putParcelableArrayList("cardList", cardResultList)
+                            putString("queryString", query)
+//                        putParcelableArrayList("totalList", totalResultList) //不能放ArrayList<Any>型態的物件進去
+                        }
+//                        searchView.isIconified = true  //搜索輸入框是否是關閉,要關閉或可用searchItem.collapseActionView()
+                        //將search的editTextView的focus釋放掉,否則按back鍵返回時會因爲需要先進行收鍵盤的動作,
+                        //再按第二次才會back回上一頁,即使用程式先收起鍵盤,back鍵還是會因爲focus在search的editTextView,
+                        //而進行收鍵盤的動作,所以我們要在這邊clearFocus
+//                        searchView.clearFocus()
+                        searchView.onActionViewCollapsed()
+
+                        supportFragmentManager.popBackStack("MainFragment", POP_BACK_STACK_INCLUSIVE)
                         supportFragmentManager.beginTransaction().apply {
                             setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
                             replace(R.id.frame_layout, searchResultFragment, "searchResultFragment")
                             addToBackStack("MainFragment")
                             commit()
                         }
+
                     } else {
                         Toast.makeText(this@SecondActivity, "$query 查無資料", Toast.LENGTH_SHORT).show()
                     }
@@ -212,9 +238,9 @@ class SecondActivity : AppCompatActivity() {
 
                 //當search text改變時,即時的動作
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    if (newText!!.isNotEmpty()) {
-                        //這裡沒用到
-                    }
+//                    if (newText!!.isNotEmpty()) {
+//                        //這裡沒用到
+//                    }
                     return true
                 }
             })

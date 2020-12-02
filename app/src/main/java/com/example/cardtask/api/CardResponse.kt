@@ -69,7 +69,7 @@ data class CardResponse(
                 @SerializedName("id")
                 val id: Int = 0, // 1
                 @SerializedName("image")
-                val image: String, // null
+                val image: String = "", // null
                 @SerializedName("status")
                 val status: Boolean = false, // false
                 @SerializedName("tag")
@@ -81,7 +81,7 @@ data class CardResponse(
                 @SerializedName("updated_at")
                 val updatedAt: String = "", // 2020-09-04T16:22:13.000000Z
                 @SerializedName("taskType")
-                val type: String = "taskType"   //給adapter判斷用
+                val type: String= "taskType"   //給adapter判斷用
             ) : Parcelable
         }
     }

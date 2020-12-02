@@ -1,5 +1,6 @@
 package com.example.cardtask.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -32,6 +33,7 @@ class SearchResultFragment : Fragment() {
     private lateinit var rootView: View
     private lateinit var cardResultList: ArrayList<CardResponse.UserData.ShowCard>
     private lateinit var taskResultList: ArrayList<CardResponse.UserData.ShowCard.ShowTask>
+    private lateinit var queryString: String
     private var totalResultList = arrayListOf<Any>()
     private val searchResultAdapter = RvSearchResultAdapter()
 
@@ -42,13 +44,14 @@ class SearchResultFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
-        cardResultList =
-            arguments?.getParcelableArrayList<CardResponse.UserData.ShowCard>("cardList") as ArrayList<CardResponse.UserData.ShowCard>
+        cardResultList = arguments?.getParcelableArrayList<CardResponse.UserData.ShowCard>("cardList")
+                as ArrayList<CardResponse.UserData.ShowCard>
 
-        taskResultList =
-            arguments?.getParcelableArrayList<CardResponse.UserData.ShowCard.ShowTask>("taskList") as ArrayList<CardResponse.UserData.ShowCard.ShowTask>
+        taskResultList = arguments?.getParcelableArrayList<CardResponse.UserData.ShowCard.ShowTask>("taskList")
+                as ArrayList<CardResponse.UserData.ShowCard.ShowTask>
 
-        totalResultList.clear()
+        queryString = arguments?.getString("queryString").toString()
+
         totalResultList.addAll(cardResultList)
         totalResultList.addAll(taskResultList)
     }
@@ -62,6 +65,7 @@ class SearchResultFragment : Fragment() {
         return rootView
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //  背景圖用
@@ -73,8 +77,10 @@ class SearchResultFragment : Fragment() {
         Log.d("list", "task $taskResultList")
 
         rootView.rv_searchResult.adapter = searchResultAdapter
-        rootView.rv_searchResult.layoutManager = LinearLayoutManager(activity,LinearLayoutManager.VERTICAL,false)
+        rootView.rv_searchResult.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         searchResultAdapter.update(totalResultList)
+
+        rootView.tv_searchResult.text = "'$queryString' 的搜尋結果"
 
 
     }
