@@ -38,7 +38,6 @@ val mainFragment = MainFragment()
 class SecondActivity : AppCompatActivity() {
 
     companion object {
-        //        val totalResultList =  ArrayList<Any>()
         val totalCardList = mutableListOf<CardResponse.UserData.ShowCard>()
     }
 
@@ -70,6 +69,7 @@ class SecondActivity : AppCompatActivity() {
         toggle.syncState()
         // Set the toolbar
         setSupportActionBar(toolbar)
+        //側邊各item的點擊監聽
         navigation.setNavigationItemSelectedListener {
             Toast.makeText(this, it.itemId.toString(), Toast.LENGTH_LONG).show()
             when (it.itemId) {
@@ -78,6 +78,12 @@ class SecondActivity : AppCompatActivity() {
 //                    drawerLayout.closeDrawers()
                     //用Handler收drawer,可以smooth一點點
                     Handler().postDelayed({ drawerLayout.closeDrawer(GravityCompat.START) }, 200)
+                }
+                R.id.btn_logOut ->{
+                    pref.delete()
+                    Toast.makeText(this@SecondActivity, "log out click", Toast.LENGTH_SHORT).show()
+                    this@SecondActivity.finish()
+                    startActivity(Intent(this@SecondActivity, MainActivity::class.java))
                 }
 //                R.id.group1_1 -> {
 //                    changeFragment(it.title.toString(), Group1_1Fragment())
@@ -95,13 +101,6 @@ class SecondActivity : AppCompatActivity() {
             startActivity(Intent(this@SecondActivity, MainActivity::class.java))
         }
 
-        data class Item(
-            val type: String,
-            val id: String, //card -> cardId, task ->taskId
-            val title: String
-        )
-
-
 //        if (savedInstanceState == null) {
         Toast.makeText(this, "TOKEN = $token", Toast.LENGTH_SHORT).show()
         Api.retrofitService.getCard(token)
@@ -116,19 +115,13 @@ class SecondActivity : AppCompatActivity() {
                 ) {
                     val res = response.body()
                     if (response.isSuccessful) {
+                        totalCardList.clear()
                         userName.text = res?.userData?.username
                         if (res?.userData?.image.toString() != "null") {
                             Glide.with(this@SecondActivity)
                                 .load("https://storage.googleapis.com/gcs.gill.gq/${res?.userData?.image.toString()}")
                                 .transform(CircleCrop()).into(userImage)
                             userEmail.text = res?.userData?.email
-                        }
-                        val items = res?.userData?.showCards?.map {
-//                            Item(
-//                                type = "card",
-//                                id = it.id,
-//                                ....
-//                            )
                         }
                         res?.userData?.showCards?.forEach { card ->
                             totalCardList.add(card)
@@ -206,7 +199,7 @@ class SecondActivity : AppCompatActivity() {
                     }
 
                     if (cardResultList.isNotEmpty() || taskResultList.isNotEmpty()) {
-                        searchItem.collapseActionView()
+                        searchItem.collapseActionView() //搜尋完後,將toolbar恢復原樣
                         val searchResultFragment = SearchResultFragment()
 
                         searchResultFragment.arguments = Bundle().apply {

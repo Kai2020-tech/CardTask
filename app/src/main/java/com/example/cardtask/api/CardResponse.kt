@@ -46,7 +46,7 @@ data class CardResponse(
             @SerializedName("updated_at")
             val updatedAt: String = "", // 2020-09-04T16:17:53.000000Z
             @SerializedName("cardType")
-            val type: String = "cardType"   //給adapter判斷用
+            val type: String = "card"   //給adapter判斷用
         ) : Parcelable {
             @Parcelize
             data class Pivot(
@@ -81,7 +81,7 @@ data class CardResponse(
                 @SerializedName("updated_at")
                 val updatedAt: String = "", // 2020-09-04T16:22:13.000000Z
                 @SerializedName("taskType")
-                val type: String= "taskType"   //給adapter判斷用
+                val type: String= "task"   //給adapter判斷用
             ) : Parcelable
         }
     }

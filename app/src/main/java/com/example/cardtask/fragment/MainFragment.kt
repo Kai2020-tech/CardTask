@@ -114,7 +114,7 @@ class MainFragment : Fragment()
             /*if(){ true} else{ false}*/
         }
         rootView.rv_groupCard.adapter = groupCardAdapter
-            //.apply {
+        //.apply {
 //            setCardClickListener(object : RvCardAdapter.IClickListener {
 //                override fun click(position: Int) {     //點擊卡片,到編輯頁面,add EdCareFragment
 //                    showToast("Item $position clicked")
@@ -128,10 +128,9 @@ class MainFragment : Fragment()
 //            })
 
 
-
 //            val (clickListener, longClickListener) = generateRvCardAdapterListener()
 //            setCardClickListener(clickListener, longClickListener)
-       //}
+        //}
         setRvLayout()
 
         newCardFab()
@@ -285,29 +284,29 @@ class MainFragment : Fragment()
     }
 
 
-    private fun goToCard(card: CardResponse.UserData.ShowCard) {    //參數設爲明確的card,無論哪個recyclerView都可正確
-        Log.d("card id", "${card.id}")
-        val cardFragment = CardFragment()
-//                    fragment傳遞資料要使用系統的arguments
-        cardFragment.arguments = Bundle().apply {
-            putParcelable("card", card)
-//            putInt("pos", position)
-            putInt("id", card.id)
-            putBoolean("private", card.private)
-        }
-        /**將此fragment設爲target,接受回來的資料*/
-        cardFragment.setTargetFragment(this, cardRequestCode)
-
-        requireFragmentManager().beginTransaction().apply {
-            setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-            add(R.id.frame_layout, cardFragment)
-            addToBackStack("edCardFragment")
-            commit()
-        }
-    }
+//    private fun goToCard(card: CardResponse.UserData.ShowCard) {    //參數設爲明確的card,無論哪個recyclerView都可正確
+//        Log.d("card id", "${card.id}")
+//        val cardFragment = CardFragment()
+////                    fragment傳遞資料要使用系統的arguments
+//        cardFragment.arguments = Bundle().apply {
+//            putParcelable("card", card)
+////            putInt("pos", position)
+//            putInt("id", card.id)
+//            putBoolean("private", card.private)
+//        }
+//        /**將此fragment設爲target,接受回來的資料*/
+//        cardFragment.setTargetFragment(this, cardRequestCode)
+//
+//        requireFragmentManager().beginTransaction().apply {
+//            setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+//            add(R.id.frame_layout, cardFragment)
+//            addToBackStack("edCardFragment")
+//            commit()
+//        }
+//    }
 
     private fun delCard(card: CardResponse.UserData.ShowCard) {
-        val delBuild = AlertDialog.Builder(activity,R.style.delCardDialogTheme)  //自訂dialog背景色
+        val delBuild = AlertDialog.Builder(activity, R.style.delCardDialogTheme)  //自訂dialog背景色
         val cardName = card.cardName
         val cardId = card.id
         delBuild
@@ -328,7 +327,7 @@ class MainFragment : Fragment()
     }
 
     private fun delGroupCard(card: CardResponse.UserData.ShowCard) {
-        val delBuild = AlertDialog.Builder(activity,R.style.delGroupCardDialogTheme)
+        val delBuild = AlertDialog.Builder(activity, R.style.delGroupCardDialogTheme)
         val cardName = card.cardName
         val cardId = card.id
         delBuild

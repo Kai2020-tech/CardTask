@@ -22,6 +22,7 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.example.cardtask.api.CardResponse
+import com.example.cardtask.fragment.CardFragment
 import com.example.cardtask.fragment.MainFragment.Companion.CAMERA_REQUEST_CODE
 import com.example.cardtask.fragment.MainFragment.Companion.GALLERY_REQUEST_CODE
 import com.example.cardtask.fragment.EdTaskFragment
@@ -114,6 +115,28 @@ private fun Fragment.getPhotoFile(fileName: String): File {
 //
 //    return File.createTempFile("", ".jpg", storageDirectory)
 }
+
+fun Fragment.goToCard(card: CardResponse.UserData.ShowCard) {    //參數設爲明確的card,無論哪個recyclerView都可正確
+    Log.d("card id", "${card.id}")
+    val cardFragment = CardFragment()
+//                    fragment傳遞資料要使用系統的arguments
+    cardFragment.arguments = Bundle().apply {
+        putParcelable("card", card)
+//            putInt("pos", position)
+        putInt("id", card.id)
+        putBoolean("private", card.private)
+    }
+    /**將此fragment設爲target,接受回來的資料*/
+    cardFragment.setTargetFragment(this, 456)
+
+    requireFragmentManager().beginTransaction().apply {
+        setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+        add(R.id.frame_layout, cardFragment)
+        addToBackStack("edCardFragment")
+        commit()
+    }
+}
+
 
 fun Fragment.goToEdTask(showTask: CardResponse.UserData.ShowCard.ShowTask) {
     val edTaskFragment = EdTaskFragment()

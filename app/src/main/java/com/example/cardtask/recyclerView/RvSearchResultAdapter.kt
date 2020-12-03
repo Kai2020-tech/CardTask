@@ -1,120 +1,95 @@
 package com.example.cardtask.recyclerView
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cardtask.R
 import com.example.cardtask.api.CardResponse
 import kotlinx.android.synthetic.main.model_search_result.view.*
+import kotlinx.android.synthetic.main.model_task.view.*
 
-class RvSearchResultAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class RvSearchResultAdapter() : RecyclerView.Adapter<RvSearchResultAdapter.ResultViewHolder>() {
 
-    private val rvSearchResultList = mutableListOf<Any>()
-    private val rvTaskResultList = mutableListOf<CardResponse.UserData.ShowCard.ShowTask>()
+    private val rvSearchResultList = mutableListOf<SearchResultItem>()
+    var resultClickListener: (SearchResultItem) -> Unit = {}
+    var resultLongClickListener: (SearchResultItem) -> Boolean = { true }
 
-    var listener: (CardResponse.UserData.ShowCard.ShowTask) -> Unit = {}
-    var longClickListener: (position: Int) -> Boolean = { true }
-    var taskLongClick: (CardResponse.UserData.ShowCard.ShowTask) -> Boolean = { true }
-
-//    fun setListener(mClickListener: IClickListener,mLongClickListener: ILongClickListener){
-//        this.listener = mClickListener
-//        this.longClickListener = mLongClickListener
-//    }
-
-    inner class CardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardTitle: TextView = itemView.tv_resultTitle
-        val cardType: TextView = itemView.tv_resultType
-
-
+    inner class ResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val resultItem: ConstraintLayout = itemView.cv_searchResultItem
+        val title: TextView = itemView.tv_resultTitle
+        val type: TextView = itemView.tv_resultType
+        val taskColor: ImageView = itemView.img_taskColor2
     }
 
-    inner class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val taskTitle: TextView = itemView.tv_resultTitle
-        val taskType: TextView = itemView.tv_resultType
-
-    }
-
-//        init {
-//            itemView.setOnClickListener {
-////                clickListener.click(adapterPosition)
-////                listener?.click(adapterPosition)
-////                listener.invoke()
-//            }
-//        }
-
-
-    override fun getItemViewType(position: Int): Int {
-//        val list = rvCardResultList.flatMap { it.showTasks}
-        return if (rvSearchResultList[position] is CardResponse.UserData.ShowCard) 1
-        else 2 //if (rvSearchResultList[position] is CardResponse.UserData.ShowCard.ShowTask)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-
-        return if (viewType == 1) {
-            val cardView = LayoutInflater.from(parent.context).inflate(
-                R.layout.model_search_result, parent, false
-            )
-            CardViewHolder(cardView)
-        } else {
-            val taskView = LayoutInflater.from(parent.context).inflate(
-                R.layout.model_search_result, parent, false
-            )
-            TaskViewHolder(taskView)
-        }
-
-
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultViewHolder {
+        val resultItem = LayoutInflater.from(parent.context).inflate(
+            R.layout.model_search_result, parent, false
+        )
+        return ResultViewHolder(resultItem)
     }
 
     override fun getItemCount(): Int {
         return rvSearchResultList.size
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ResultViewHolder, position: Int) {
         val currentItem = rvSearchResultList[position]
-
-        if (holder is CardViewHolder ) {
-//            listener.click("typeTask")
-            holder.cardType.text = (currentItem as CardResponse.UserData.ShowCard).type
-            holder.cardTitle.text = (currentItem as CardResponse.UserData.ShowCard).cardName
-
-        } else if(holder is TaskViewHolder){
-//            listener.click("typeCard")
-            holder.taskType.text = (currentItem as CardResponse.UserData.ShowCard.ShowTask).type
-//            holder.resultType.text = "任務"
-            holder.taskTitle.text = (currentItem as CardResponse.UserData.ShowCard.ShowTask).title
+        var colorNum = R.color.origin
+        colorNum = when (currentItem.tag) {
+            "red" -> R.color.red
+            "orange" -> R.color.orange
+            "yellow" -> R.color.yellow
+            "green" -> R.color.green
+            "blue" -> R.color.blue
+            "darkBlue" -> R.color.darkBlue
+            "purple" -> R.color.purple
+            else -> R.color.origin
         }
 
+        holder.title.text = currentItem.title
+//        holder.type.text = currentItem.type
+        when(currentItem.type){
+            "task" -> {
+                holder.taskColor.visibility= View.VISIBLE
+                holder.type.visibility = View.GONE
+                holder.taskColor.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, colorNum))
+            }
+            "card" ->{
+                if(currentItem.isPrivate==true){
+                    holder.type.text = "個人卡片"
+                    holder.resultItem.setBackgroundColor(Color.parseColor("#FFE0B2"))
+                }else{
+                    holder.type.text = "群組卡片"
+                    holder.resultItem.setBackgroundColor(Color.parseColor("#FFAB91"))
+                }
+            }
+        }
 
-//        holder.taskTitle.text = currentItem.title
-////        holder.cvTask.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, colorNum))
-//        holder.taskColor.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, colorNum))
-//        holder.cvTask.setOnClickListener { listener.invoke(currentItem) }
-//        holder.cvTask.setOnLongClickListener {
-//            //用於card fragment
-//            longClickListener.invoke(position)
-//            //用於main fragment
-//            taskLongClick.invoke(rvResultList[position])
-//        }
+        holder.resultItem.setOnClickListener {
+            resultClickListener.invoke(currentItem)
+        }
 
-//        holder.cv.setOnClickListener { Toast.makeText(holder.cv.context, "In", Toast.LENGTH_SHORT).show() }   //Elvis
+        holder.resultItem.setOnLongClickListener {
+            resultLongClickListener.invoke(currentItem)
+        }
     }
 
-    fun update(updateList: MutableList<Any>) {
+    fun update(updateList: MutableList<SearchResultItem>) {
         rvSearchResultList.clear()
         rvSearchResultList.addAll(updateList)
         notifyDataSetChanged()
     }
-
-//    interface ILongClickListener {
-//        fun longClick(position: Int)
-//    }
-//
-//    interface IClickListener {
-//        fun click(position: Int)
-//    }
-
-
 }
+data class SearchResultItem(
+    val title: String,
+    val id: Int,
+    val type: String,   //card -> cardType , task -> taskType
+    val tag: String?,
+    val isPrivate: Boolean?
+)

@@ -1,6 +1,7 @@
 package com.example.cardtask.fragment
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,12 +10,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cardtask.R
-import com.example.cardtask.api.CardResponse
+import com.example.cardtask.api.*
+import com.example.cardtask.goToCard
+import com.example.cardtask.goToEdTask
 import com.example.cardtask.recyclerView.RvSearchResultAdapter
+import com.example.cardtask.recyclerView.SearchResultItem
 import com.example.cardtask.showToast
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.fragment_search_result.*
 import kotlinx.android.synthetic.main.fragment_search_result.view.*
+import retrofit2.Call
+import retrofit2.Response
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -33,8 +39,8 @@ class SearchResultFragment : Fragment() {
     private lateinit var rootView: View
     private lateinit var cardResultList: ArrayList<CardResponse.UserData.ShowCard>
     private lateinit var taskResultList: ArrayList<CardResponse.UserData.ShowCard.ShowTask>
+    private lateinit var resultItemList: MutableList<SearchResultItem>
     private lateinit var queryString: String
-    private var totalResultList = arrayListOf<Any>()
     private val searchResultAdapter = RvSearchResultAdapter()
 
 
@@ -51,9 +57,6 @@ class SearchResultFragment : Fragment() {
                 as ArrayList<CardResponse.UserData.ShowCard.ShowTask>
 
         queryString = arguments?.getString("queryString").toString()
-
-        totalResultList.addAll(cardResultList)
-        totalResultList.addAll(taskResultList)
     }
 
     override fun onCreateView(
@@ -75,14 +78,110 @@ class SearchResultFragment : Fragment() {
 
         Log.d("list", "card $cardResultList")
         Log.d("list", "task $taskResultList")
+        //加入search result的card
+        resultItemList = cardResultList.map {
+            SearchResultItem(
+                title = it.cardName,
+                id = it.id,
+                type = it.type,
+                tag = null,
+                isPrivate = it.private
+            )
+        }.toMutableList()
+        //加入search result的task
+        resultItemList.addAll(taskResultList.map {
+            SearchResultItem(
+                title = it.title,
+                id = it.id,
+                type = it.type,
+                tag = it.tag,
+                isPrivate = null
+            )
+        })
+        print("HHH $resultItemList")
+        Log.d("HHH", "$resultItemList")
 
         rootView.rv_searchResult.adapter = searchResultAdapter
         rootView.rv_searchResult.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-        searchResultAdapter.update(totalResultList)
+        searchResultAdapter.update(resultItemList)
 
-        rootView.tv_searchResult.text = "'$queryString' 的搜尋結果"
+        searchResultAdapter.resultClickListener = { searchResultItem ->
+            showToast("$searchResultItem")
+            when (searchResultItem.type) {
+                "task" -> {
+                    taskResultList.forEach {
+                        if (it.id == searchResultItem.id) goToEdTask(it)
+                    }
+                }
+                "card" -> {
+                    cardResultList.forEach {
+                        if (it.id == searchResultItem.id) goToCard(it)
+                    }
+                }
+            }
+        }
 
+        searchResultAdapter.resultLongClickListener = { searchResultItem ->
+            when (searchResultItem.type) {
+                "task" -> {
+                    taskResultList.forEach {
+                        if (it.id == searchResultItem.id) delTask(searchResultItem)
+                    }
+                    true
+                }
+                "card" -> {
+                    cardResultList.forEach {
+                        if (it.id == searchResultItem.id) delCard(searchResultItem)
+                    }
+                    true
+                }
+                else -> true
+            }
+        }
 
+        rootView.tv_searchResult.text = "'$queryString' 的搜尋結果,共有${resultItemList.size}筆"
+
+    }
+
+    private fun delCard(card: SearchResultItem) {
+        val delBuild = AlertDialog.Builder(activity, R.style.delCardDialogTheme)  //自訂dialog背景色
+        val cardName = card.title
+        val cardId = card.id
+        delBuild
+            .setTitle("確認要刪除卡片 [$cardName]?")
+            .setPositiveButton("刪除") { _, _ ->
+                Api.retrofitService.deleteCard(token, cardId)
+                    .enqueue(object : MyCallback<DeleteCardResponse>() {
+                        override fun onSuccess(call: Call<DeleteCardResponse>, response: Response<DeleteCardResponse>) {
+                            showToast("卡片 [$cardName] 已刪除")
+                            Log.d("Success!", "Delete Card OK")
+                            resultItemList.remove(card)
+                            searchResultAdapter.update(resultItemList)
+                        }
+                    })
+            }
+            .setNegativeButton("取消") { _, _ -> }
+            .show()
+    }
+
+    private fun delTask(task: SearchResultItem) {
+        val delBuild = AlertDialog.Builder(activity)
+        delBuild.setTitle("確認要刪除Task [${task.title}]?")
+            .setPositiveButton("刪除") { _, _ ->
+                Api.retrofitService.deleteTask(token, task.id)
+                    .enqueue(object : MyCallback<DeleteTaskResponse>() {
+                        override fun onSuccess(
+                            call: Call<DeleteTaskResponse>, response: Response<DeleteTaskResponse>
+                        ) {
+                            showToast("Task [${task.title}] 已刪除")
+                            resultItemList.remove(task)
+                            searchResultAdapter.update(resultItemList)
+                        }
+                    })
+            }
+            .setNegativeButton("取消") { _, _ ->
+            }
+            .show()
     }
 
     companion object {
