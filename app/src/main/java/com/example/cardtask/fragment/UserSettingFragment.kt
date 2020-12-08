@@ -1,25 +1,35 @@
 package com.example.cardtask.fragment
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.cardtask.R
 import com.example.cardtask.api.Api
-import com.example.cardtask.api.ChangeInfo
 import com.example.cardtask.api.ChangeInfoResponse
+import com.example.cardtask.api.UploadUserPhoto
 import com.example.cardtask.api.token
+import com.example.cardtask.createMultipartBody
+import com.example.cardtask.getPhoto
 import com.example.cardtask.showToast
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_user_setting.*
 import kotlinx.android.synthetic.main.fragment_user_setting.view.*
+import okhttp3.MultipartBody
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 
 
 class UserSettingFragment : Fragment() {
@@ -28,6 +38,8 @@ class UserSettingFragment : Fragment() {
     private var userPhotoPath = ""
     private var userEmail = ""
     private var userName = ""
+    private var photoFile: File? = null
+    private var galleryUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,8 +69,10 @@ class UserSettingFragment : Fragment() {
         rootView.tv_userSettingName.text = userName
         rootView.tv_userSettingEmail.text = userEmail
 
-//        rootView.ed_userSettingPassword.setText("")
-//        rootView.ed_passwordDoubleCheck.setText("")
+        //上傳圖片
+        rootView.btn_takePhoto.setOnClickListener {
+            photoFile = getPhoto(activity)
+        }
 
         //修改資料
         rootView.btn_settingChange.setOnClickListener {
@@ -68,12 +82,13 @@ class UserSettingFragment : Fragment() {
             rootView.textView5.visibility = View.VISIBLE
 
             rootView.ed_userSettingName.visibility = View.VISIBLE
-//            rootView.ed_userSettingPassword.visibility = View.VISIBLE
             rootView.ed_passwordLayout.visibility = View.VISIBLE
             rootView.ed_passwordDoubleCheckLayout.visibility = View.VISIBLE
 
             rootView.btn_settingConfirm.visibility = View.VISIBLE
             rootView.btn_settingCancel.visibility = View.VISIBLE
+
+            rootView.btn_takePhoto.visibility = View.INVISIBLE
         }
         //取消修改
         rootView.btn_settingCancel.setOnClickListener {
@@ -91,6 +106,8 @@ class UserSettingFragment : Fragment() {
 
             rootView.btn_settingConfirm.visibility = View.INVISIBLE
             rootView.btn_settingCancel.visibility = View.INVISIBLE
+
+            rootView.btn_takePhoto.visibility = View.VISIBLE
         }
         //確認修改
         rootView.btn_settingConfirm.setOnClickListener {
@@ -109,6 +126,29 @@ class UserSettingFragment : Fragment() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+//相機, intent回來
+        if (requestCode == MainFragment.CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Glide.with(this).load(photoFile).transform(CircleCrop()).into(rootView.img_userSettingPhoto)
+            Log.d("uri camera", photoFile?.path.toString())
+            rootView.img_userSettingPhoto.background = null
+
+            changeUserPhoto()
+
+        }
+//相簿, intent回來
+        else if (requestCode == MainFragment.GALLERY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            galleryUri = data?.data!!
+            Log.d("gallery", "uri: $galleryUri")
+            Glide.with(this).load(galleryUri).transform(CircleCrop()).into(rootView.img_userSettingPhoto)
+            rootView.img_userSettingPhoto.background = null
+
+            changeUserPhoto()
+        }
+    }
+
     private fun changUserName() {
         Api.retrofitService.changUserName(token, rootView.ed_userSettingName.text.toString())
             .enqueue(object : retrofit2.Callback<ChangeInfoResponse> {
@@ -119,7 +159,7 @@ class UserSettingFragment : Fragment() {
                 override fun onResponse(call: Call<ChangeInfoResponse>, response: Response<ChangeInfoResponse>) {
                     if (response.isSuccessful) {
                         showToast("暱稱 已修改")
-                    }else showToast("${response.errorBody()}")
+                    } else errorMessage(response)
                 }
             })
     }
@@ -134,7 +174,7 @@ class UserSettingFragment : Fragment() {
                 override fun onResponse(call: Call<ChangeInfoResponse>, response: Response<ChangeInfoResponse>) {
                     if (response.isSuccessful) {
                         showToast("密碼 已修改")
-                    }else showToast("${response.errorBody()}")
+                    } else errorMessage(response)
                 }
             })
     }
@@ -153,10 +193,59 @@ class UserSettingFragment : Fragment() {
                 override fun onResponse(call: Call<ChangeInfoResponse>, response: Response<ChangeInfoResponse>) {
                     if (response.isSuccessful) {
                         showToast("暱稱,密碼 已修改")
-                    }else { //error body要以下方式去接
+                    } else { //error body要以下方式去接
+                        errorMessage(response)
+                    }
+                }
+            })
+    }
+
+    private fun errorMessage(response: Response<ChangeInfoResponse>) {
+        val gson = Gson()
+        val type = object : TypeToken<ChangeInfoResponse>() {}.type
+        var errorResponse: ChangeInfoResponse = gson.fromJson(response.errorBody()!!.charStream(), type)
+        showToast(errorResponse.error)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun changeUserPhoto() {
+        rootView.btn_settingChange.visibility = View.INVISIBLE
+        rootView.btn_uploadPhoto.visibility = View.VISIBLE
+        rootView.btn_cancelUpload.visibility = View.VISIBLE
+
+        rootView.btn_cancelUpload.setOnClickListener {
+            Glide.with(this).load(userPhotoPath).transform(CircleCrop()).into(rootView.img_userSettingPhoto)
+            rootView.btn_settingChange.visibility = View.VISIBLE
+            rootView.btn_uploadPhoto.visibility = View.INVISIBLE
+            rootView.btn_cancelUpload.visibility = View.INVISIBLE
+        }
+
+        rootView.btn_uploadPhoto.setOnClickListener {
+            uploadUserPhoto()
+            rootView.btn_settingChange.visibility = View.VISIBLE
+            rootView.btn_uploadPhoto.visibility = View.INVISIBLE
+            rootView.btn_cancelUpload.visibility = View.INVISIBLE
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun uploadUserPhoto() {
+        val file = File(photoFile?.path ?: "")
+        val imageBody: MultipartBody.Part? =
+            if (galleryUri != null) createMultipartBody(galleryUri) else createMultipartBody(file)
+        Api.retrofitService.uploadUserPhoto(token, imageBody)
+            .enqueue(object : Callback<UploadUserPhoto> {
+                override fun onFailure(call: Call<UploadUserPhoto>, t: Throwable) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponse(call: Call<UploadUserPhoto>, response: Response<UploadUserPhoto>) {
+                    if (response.isSuccessful) {
+                        showToast("圖片已更新")
+                    } else {
                         val gson = Gson()
-                        val type = object : TypeToken<ChangeInfoResponse>() {}.type
-                        var errorResponse: ChangeInfoResponse = gson.fromJson(response.errorBody()!!.charStream(), type)
+                        val type = object : TypeToken<UploadUserPhoto>() {}.type
+                        var errorResponse: UploadUserPhoto = gson.fromJson(response.errorBody()!!.charStream(), type)
                         showToast(errorResponse.error)
                     }
                 }

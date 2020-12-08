@@ -63,7 +63,7 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="80dp"
         android:text="暱稱"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
@@ -75,7 +75,7 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="50dp"
         android:text="新密碼"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
@@ -94,7 +94,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView3" />
 
-<!-- 一個TextInputLayout裡面只能包一個EditText   -->
+    <!-- 一個TextInputLayout裡面只能包一個EditText   -->
 
 
     <com.google.android.material.textfield.TextInputLayout
@@ -170,7 +170,7 @@
         app:layout_constraintStart_toEndOf="@+id/btn_settingChange" />
 
     <ImageView
-        android:id="@+id/btn_updatePhoto"
+        android:id="@+id/btn_takePhoto"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginTop="64dp"
@@ -186,13 +186,40 @@
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="50dp"
         android:text="確認密碼"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.169"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+    <Button
+        android:id="@+id/btn_cancelUpload"
+        style="@style/buttonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="取消"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/btn_uploadPhoto"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_userSettingEmail" />
+
+    <Button
+        android:id="@+id/btn_uploadPhoto"
+        style="@style/buttonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="上傳圖片"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btn_cancelUpload"
+        app:layout_constraintTop_toBottomOf="@+id/tv_userSettingEmail" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

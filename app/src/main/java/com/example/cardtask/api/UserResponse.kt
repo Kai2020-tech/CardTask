@@ -60,7 +60,7 @@ data class AddUserResponse(
     )
 }
 
-// 群組卡片刪除使用者
+//群組卡片刪除使用者
 data class DelUser(
     @SerializedName("user_id")
     val usersId: Int = 0 // 2
@@ -71,24 +71,18 @@ data class DelUserResponse(
     val status: Boolean = false // true
 )
 
-data class AddUserFailResponse(
-    @SerializedName("error")
-    val error: String = "", // user search not found
-    @SerializedName("status")
-    val status: Boolean = false // false
-)
-
 //修改暱稱,密碼
-data class ChangeInfo(
-    @SerializedName("password")
-    var password: String? = "", // 00000000
-    @SerializedName("username")
-    var username: String = "" // gill
-)
-
 data class ChangeInfoResponse(
     @SerializedName("error")
     val error: String = "", // password should over 8 characters and only 0-9,a-z,A-Z.
     @SerializedName("status")
     val status: Boolean = false // false
+)
+
+//上傳頭像
+data class UploadUserPhoto(
+    @SerializedName("error")
+    val error: String = "", // upload error
+    @SerializedName("status")
+    val status: Boolean? = false // false
 )

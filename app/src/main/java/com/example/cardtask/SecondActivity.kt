@@ -164,6 +164,10 @@ class SecondActivity : AppCompatActivity() {
 
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     //  覆寫 onOptionsItemSelected 漢堡選單按了才有功能
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {

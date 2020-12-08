@@ -107,7 +107,7 @@ interface ApiService {
         @Body userId: DelUser
     ): Call<DelUserResponse>
 
-    //修改暱稱,密碼
+    //以下三個方法是修改暱稱,密碼
     @FormUrlEncoded
     @PUT("user")
     fun changUserName(
@@ -130,6 +130,14 @@ interface ApiService {
         @Field("username") userName: String,
         @Field("password") password: String
     ): Call<ChangeInfoResponse>
+
+    //更新user頭像
+    @POST("user/image")
+    @Multipart
+    fun uploadUserPhoto(
+        @Header("userToken") userToken: String,
+        @Part image: MultipartBody.Part?
+    ): Call<UploadUserPhoto>
 }
 
 object Api {
