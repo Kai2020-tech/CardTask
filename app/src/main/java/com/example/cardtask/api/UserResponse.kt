@@ -77,3 +77,18 @@ data class AddUserFailResponse(
     @SerializedName("status")
     val status: Boolean = false // false
 )
+
+//修改暱稱,密碼
+data class ChangeInfo(
+    @SerializedName("password")
+    var password: String? = "", // 00000000
+    @SerializedName("username")
+    var username: String = "" // gill
+)
+
+data class ChangeInfoResponse(
+    @SerializedName("error")
+    val error: String = "", // password should over 8 characters and only 0-9,a-z,A-Z.
+    @SerializedName("status")
+    val status: Boolean = false // false
+)

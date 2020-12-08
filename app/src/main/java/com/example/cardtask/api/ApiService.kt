@@ -106,6 +106,30 @@ interface ApiService {
         @Path("cardId") card_id: Int,
         @Body userId: DelUser
     ): Call<DelUserResponse>
+
+    //修改暱稱,密碼
+    @FormUrlEncoded
+    @PUT("user")
+    fun changUserName(
+        @Header("userToken") userToken: String,
+        @Field("username") userName: String
+//        @Body changeInfo: ChangeInfo,
+    ): Call<ChangeInfoResponse>
+
+    @FormUrlEncoded
+    @PUT("user")
+    fun changUserPassword(
+        @Header("userToken") userToken: String,
+        @Field("password") password: String
+    ): Call<ChangeInfoResponse>
+
+    @FormUrlEncoded
+    @PUT("user")
+    fun changUserNameAndPassword(
+        @Header("userToken") userToken: String,
+        @Field("username") userName: String,
+        @Field("password") password: String
+    ): Call<ChangeInfoResponse>
 }
 
 object Api {

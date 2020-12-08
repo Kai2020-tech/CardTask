@@ -4,7 +4,6 @@ package com.example.cardtask
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
@@ -21,9 +20,8 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.cardtask.api.Api
 import com.example.cardtask.api.CardResponse
 import com.example.cardtask.fragment.MainFragment
-import com.example.cardtask.fragment.MainFragment.Companion.cardList
-import com.example.cardtask.fragment.MainFragment.Companion.groupCardList
 import com.example.cardtask.fragment.SearchResultFragment
+import com.example.cardtask.fragment.UserSettingFragment
 import kotlinx.android.synthetic.main.activity_second.*
 import kotlinx.android.synthetic.main.activity_second.view.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
@@ -41,6 +39,8 @@ class SecondActivity : AppCompatActivity() {
         val totalCardList = mutableListOf<CardResponse.UserData.ShowCard>()
     }
 
+    private val userSettingFragment = UserSettingFragment()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_second)
@@ -56,7 +56,7 @@ class SecondActivity : AppCompatActivity() {
         /** 這些是drawerLayout nav_header_mail中再下一層的view,要從最外層開始找*/
         val logOut = navigation.getHeaderView(0).findViewById<Button>(R.id.btn_logout)
         val userName = navigation.getHeaderView(0).findViewById<TextView>(R.id.tv_userName)
-        val userImage = navigation.getHeaderView(0).findViewById<ImageView>(R.id.img_user)
+        val userImage = navigation.getHeaderView(0).findViewById<ImageView>(R.id.img_userPhoto)
         val userEmail = navigation.getHeaderView(0).findViewById<TextView>(R.id.tv_userEmail)
 
         //以下側邊選單內容
@@ -71,20 +71,33 @@ class SecondActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         //側邊各item的點擊監聽
         navigation.setNavigationItemSelectedListener {
-            Toast.makeText(this, it.itemId.toString(), Toast.LENGTH_LONG).show()
+//            Toast.makeText(this, it.itemId.toString(), Toast.LENGTH_LONG).show()
             when (it.itemId) {
                 R.id.action_home -> {
-                    Toast.makeText(this, "home", Toast.LENGTH_LONG).show()
-//                    drawerLayout.closeDrawers()
+                    drawerLayout.closeDrawers()
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.frame_layout, mainFragment, "cardFragment")
+                        commit()
+                    }
                     //用Handler收drawer,可以smooth一點點
-                    Handler().postDelayed({ drawerLayout.closeDrawer(GravityCompat.START) }, 200)
+//                    Handler().postDelayed({ drawerLayout.closeDrawer(GravityCompat.START) }, 200)
                 }
-                R.id.btn_logOut ->{
+                R.id.btn_logOut -> {
                     pref.delete()
                     Toast.makeText(this@SecondActivity, "log out click", Toast.LENGTH_SHORT).show()
                     this@SecondActivity.finish()
                     startActivity(Intent(this@SecondActivity, MainActivity::class.java))
                 }
+                R.id.action_settings -> {
+                    drawerLayout.closeDrawers()
+
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.frame_layout, userSettingFragment, "userSettingFragment")
+                        commit()
+                    }
+
+                }
+
 //                R.id.group1_1 -> {
 //                    changeFragment(it.title.toString(), Group1_1Fragment())
 //                    drawer.closeDrawers()
@@ -94,6 +107,7 @@ class SecondActivity : AppCompatActivity() {
         }
         //以上側邊選單內容
 
+        //登出功能改爲在/menu/drawer的item實作
         logOut.setOnClickListener {
             pref.delete()
             Toast.makeText(this@SecondActivity, "log out click", Toast.LENGTH_SHORT).show()
@@ -118,10 +132,17 @@ class SecondActivity : AppCompatActivity() {
                         totalCardList.clear()
                         userName.text = res?.userData?.username
                         if (res?.userData?.image.toString() != "null") {
+                            val userPhotoPath = "https://storage.googleapis.com/gcs.gill.gq/${res?.userData?.image.toString()}"
                             Glide.with(this@SecondActivity)
-                                .load("https://storage.googleapis.com/gcs.gill.gq/${res?.userData?.image.toString()}")
+                                .load(userPhotoPath)
                                 .transform(CircleCrop()).into(userImage)
                             userEmail.text = res?.userData?.email
+
+                            userSettingFragment.arguments = Bundle().apply {
+                                putString("userPhotoPath",userPhotoPath)
+                                putString("userEmail",res?.userData?.email)
+                                putString("userName",res?.userData?.username)
+                            }
                         }
                         res?.userData?.showCards?.forEach { card ->
                             totalCardList.add(card)
