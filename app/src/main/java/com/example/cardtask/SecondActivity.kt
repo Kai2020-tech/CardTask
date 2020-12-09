@@ -76,26 +76,37 @@ class SecondActivity : AppCompatActivity() {
                 R.id.action_home -> {
                     drawerLayout.closeDrawers()
                     supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.frame_layout, mainFragment, "cardFragment")
+                        replace(R.id.frame_layout, mainFragment, "mainFragment")
                         commit()
                     }
                     //用Handler收drawer,可以smooth一點點
 //                    Handler().postDelayed({ drawerLayout.closeDrawer(GravityCompat.START) }, 200)
                 }
+
+                R.id.action_settings -> {
+                    drawerLayout.closeDrawers()
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.frame_layout, userSettingFragment, "userSettingFragment")
+                        addToBackStack("mainFragment")
+                        commit()
+                    }
+                }
+
+                R.id.action_help ->{
+                    drawerLayout.closeDrawers()
+                    Toast.makeText(this, "右下+號開始使用吧", Toast.LENGTH_SHORT).show()
+                }
+
+                R.id.action_about ->{
+                    drawerLayout.closeDrawers()
+                    Toast.makeText(this, "android app: Kai \n backend: Gill", Toast.LENGTH_SHORT).show()
+                }
+
                 R.id.btn_logOut -> {
                     pref.delete()
                     Toast.makeText(this@SecondActivity, "log out click", Toast.LENGTH_SHORT).show()
                     this@SecondActivity.finish()
                     startActivity(Intent(this@SecondActivity, MainActivity::class.java))
-                }
-                R.id.action_settings -> {
-                    drawerLayout.closeDrawers()
-
-                    supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.frame_layout, userSettingFragment, "userSettingFragment")
-                        commit()
-                    }
-
                 }
 
 //                R.id.group1_1 -> {
@@ -117,6 +128,7 @@ class SecondActivity : AppCompatActivity() {
 
 //        if (savedInstanceState == null) {
         Toast.makeText(this, "TOKEN = $token", Toast.LENGTH_SHORT).show()
+
         Api.retrofitService.getCard(token)
             .enqueue(object : Callback<CardResponse> {
                 override fun onFailure(call: Call<CardResponse>, t: Throwable) {
@@ -156,7 +168,7 @@ class SecondActivity : AppCompatActivity() {
                 }
             })
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.frame_layout, mainFragment, "cardFragment")
+            replace(R.id.frame_layout, mainFragment, "mainFragment")
             commit()
         }
 //        } //...savedInstanceState
@@ -166,6 +178,8 @@ class SecondActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+
     }
 
     //  覆寫 onOptionsItemSelected 漢堡選單按了才有功能
@@ -174,7 +188,6 @@ class SecondActivity : AppCompatActivity() {
             //漢堡選單原生的id,注意前要加上android才會找到正確的R class
             android.R.id.home -> {
                 drawerLayout.openDrawer(GravityCompat.START)
-//                Log.d("ham", "in")
             }
         }
 //        Log.d("ham", "${item?.itemId}")

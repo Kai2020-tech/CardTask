@@ -59,4 +59,7 @@ dependencies {
 
 //背景圖 https://github.com/JastAir/Android-BackgroundChart?utm_source=android-arsenal.com&utm_medium=referral&utm_campaign=7561
     implementation 'com.github.JastAir:Android-BackgroundChart:1.0.1-alpha'
+
+//google第三方登入
+    implementation 'com.google.android.gms:play-services-auth:19.0.0'
 }

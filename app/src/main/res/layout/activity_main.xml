@@ -8,40 +8,65 @@
     android:layout_height="match_parent"
     android:background="@drawable/login"
     tools:context=".MainActivity">
-<!--背景圖-->
-<!--https://github.com/JastAir/Android-BackgroundChart?utm_source=android-arsenal.com&utm_medium=referral&utm_campaign=7561-->
+    <!--背景圖-->
+    <!--https://github.com/JastAir/Android-BackgroundChart?utm_source=android-arsenal.com&utm_medium=referral&utm_campaign=7561-->
+
     <com.fdev.backgroundchart.GradientChart
         android:id="@+id/gradientChart"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:isBezier="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:plusColorStart="#2196F3"
-        app:plusColorEnd="#90CAF9"
-        app:minusColorStart="#90CAF9"
+        app:layout_constraintVertical_bias="0.0"
         app:minusColorEnd="#90CAF9"
-        app:zoom="10"
-        app:isBezier="true"/>
+        app:minusColorStart="#90CAF9"
+        app:plusColorEnd="#90CAF9"
+        app:plusColorStart="#2196F3"
+        app:zoom="10" /><![CDATA[
+
+
+    />
+
+    ]]>
+
+    <Button
+        android:id="@+id/google_login_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="75dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="75dp"
+        android:background="@drawable/rounded_corners"
+        android:drawableStart="@drawable/google_icon"
+        android:drawableLeft="@drawable/google_icon"
+        android:drawablePadding="8dp"
+        android:padding="8dp"
+        android:text="Sign in with Google"
+        android:textAllCaps="false"
+        android:textColor="@color/GoogleTextColor"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_forgetPassword" />
 
     <Button
         android:id="@+id/btn_login"
+        style="@style/buttonStyle"
+
         android:layout_width="0dp"
+
         android:layout_marginStart="75dp"
-        android:layout_marginLeft="75dp"
-
         android:layout_marginTop="24dp"
-
         android:layout_marginEnd="75dp"
-        android:layout_marginRight="75dp"
-
         android:text="Log In"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ed_password"
-        style="@style/buttonStyle" />
+        app:layout_constraintTop_toBottomOf="@+id/ed_password" />
 
     <EditText
         android:id="@+id/ed_email"

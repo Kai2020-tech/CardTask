@@ -253,4 +253,23 @@ class UserSettingFragment : Fragment() {
     }
 
 
+
+    //    override fun onBackPressed() {
+//        super.onBackPressed()
+//        if(supportFragmentManager.backStackEntryCount ==0){
+//            supportFragmentManager.beginTransaction().apply {
+//                replace(R.id.frame_layout, cardFragment, "cardFragment")
+//                commit()
+//            }
+//        }
+//        val pref = SharedPreferences(this)
+//        val cardFragment = supportFragmentManager.findFragmentByTag("cardFragment")
+//        if (cardFragment != null) {
+//            if (!pref.getData().isNullOrEmpty() && supportFragmentManager.backStackEntryCount == 1) {
+//                finishAffinity()    //當token登入中且fragment只有一個,按back時,結束整個app
+//            }
+//        }
+//    }
+
+
 }
