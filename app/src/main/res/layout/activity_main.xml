@@ -26,15 +26,9 @@
         app:minusColorStart="#90CAF9"
         app:plusColorEnd="#90CAF9"
         app:plusColorStart="#2196F3"
-        app:zoom="10" /><![CDATA[
-
-
-    />
-
-    ]]>
-
+        app:zoom="10" />
     <Button
-        android:id="@+id/google_login_btn"
+        android:id="@+id/btn_google_login"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -145,10 +139,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="75dp"
-        android:layout_marginLeft="75dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="75dp"
-        android:layout_marginRight="75dp"
 
         android:background="@drawable/buttonshape"
         android:shadowColor="#A2DEC4"
