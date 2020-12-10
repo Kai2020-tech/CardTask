@@ -16,7 +16,7 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.cardtask.R
 import com.example.cardtask.api.Api
 import com.example.cardtask.api.ChangeInfoResponse
-import com.example.cardtask.api.UploadUserPhoto
+import com.example.cardtask.api.UploadUserPhotoResponse
 import com.example.cardtask.api.token
 import com.example.cardtask.createMultipartBody
 import com.example.cardtask.getPhoto
@@ -234,18 +234,18 @@ class UserSettingFragment : Fragment() {
         val imageBody: MultipartBody.Part? =
             if (galleryUri != null) createMultipartBody(galleryUri) else createMultipartBody(file)
         Api.retrofitService.uploadUserPhoto(token, imageBody)
-            .enqueue(object : Callback<UploadUserPhoto> {
-                override fun onFailure(call: Call<UploadUserPhoto>, t: Throwable) {
+            .enqueue(object : Callback<UploadUserPhotoResponse> {
+                override fun onFailure(call: Call<UploadUserPhotoResponse>, t: Throwable) {
                     TODO("Not yet implemented")
                 }
 
-                override fun onResponse(call: Call<UploadUserPhoto>, response: Response<UploadUserPhoto>) {
+                override fun onResponse(call: Call<UploadUserPhotoResponse>, response: Response<UploadUserPhotoResponse>) {
                     if (response.isSuccessful) {
                         showToast("圖片已更新")
                     } else {
                         val gson = Gson()
-                        val type = object : TypeToken<UploadUserPhoto>() {}.type
-                        var errorResponse: UploadUserPhoto = gson.fromJson(response.errorBody()!!.charStream(), type)
+                        val type = object : TypeToken<UploadUserPhotoResponse>() {}.type
+                        var errorResponse: UploadUserPhotoResponse = gson.fromJson(response.errorBody()!!.charStream(), type)
                         showToast(errorResponse.error)
                     }
                 }

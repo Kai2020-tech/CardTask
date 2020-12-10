@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.example.cardtask.*
-import com.example.cardtask.SecondActivity.Companion.totalCardList
 import com.example.cardtask.api.*
 import com.example.cardtask.recyclerView.RvCardAdapter
 import kotlinx.android.synthetic.main.dialog_new_card.view.*
@@ -380,7 +379,7 @@ class MainFragment : Fragment()
             newCardDialog.btn_cardConfirm.setOnClickListener {
                 val newCard = NewCard()
 
-                newCard.cardName = newCardDialog.ed_newTask.text.toString()
+                newCard.cardName = newCardDialog.ed_forgetEmail.text.toString()
 
                 Api.retrofitService.newCard(token, newCard)
                     .enqueue(object : MyCallback<NewCardResponse>() {

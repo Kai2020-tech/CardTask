@@ -137,7 +137,19 @@ interface ApiService {
     fun uploadUserPhoto(
         @Header("userToken") userToken: String,
         @Part image: MultipartBody.Part?
-    ): Call<UploadUserPhoto>
+    ): Call<UploadUserPhotoResponse>
+
+    //Google登入
+    @POST("google/oauth/login")
+    fun googleLogin(
+        @Body googleToken: GoogleToken
+    ): Call<GoogleLoginResponse>
+
+    //忘記pw,送email
+    @GET("forget/password/{email}")
+    fun sendEmail(
+        @Path("email") email: String
+    ): Call<ForgetPasswordResponse>
 }
 
 object Api {

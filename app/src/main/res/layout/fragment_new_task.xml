@@ -85,74 +85,74 @@
             android:id="@+id/radio_btn_red"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="25dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:buttonTint="@color/red"
             android:checked="false"
-            android:scaleX="1.5"
-            android:scaleY="1.5" />
+            android:scaleX="1.0"
+            android:scaleY="1.0" />
 
         <RadioButton
             android:id="@+id/radio_btn_orange"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="25dp"
+            android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:buttonTint="@color/orange"
-            android:scaleX="1.5"
-            android:scaleY="1.5" />
+            android:scaleX="1.0"
+            android:scaleY="1.0" />
 
 
         <RadioButton
             android:id="@+id/radio_btn_yellow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="25dp"
+            android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:buttonTint="@color/yellow"
-            android:scaleX="1.5"
-            android:scaleY="1.5" />
+            android:scaleX="1.0"
+            android:scaleY="1.0" />
 
         <RadioButton
             android:id="@+id/radio_btn_green"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="25dp"
+            android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:buttonTint="@color/green"
-            android:scaleX="1.5"
-            android:scaleY="1.5" />
+            android:scaleX="1.0"
+            android:scaleY="1.0" />
 
         <RadioButton
             android:id="@+id/radio_btn_blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="25dp"
+            android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:buttonTint="@color/blue"
-            android:scaleX="1.5"
-            android:scaleY="1.5" />
+            android:scaleX="1.0"
+            android:scaleY="1.0" />
 
         <RadioButton
             android:id="@+id/radio_btn_darkBlue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="25dp"
+            android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:buttonTint="@color/darkBlue"
-            android:scaleX="1.5"
-            android:scaleY="1.5" />
+            android:scaleX="1.0"
+            android:scaleY="1.0" />
 
         <RadioButton
             android:id="@+id/radio_btn_purple"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="25dp"
+            android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:buttonTint="@color/purple"
-            android:scaleX="1.5"
-            android:scaleY="1.5" />
+            android:scaleX="1.0"
+            android:scaleY="1.0" />
 
     </RadioGroup>
 

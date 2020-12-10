@@ -30,8 +30,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-val mainFragment = MainFragment()
-//val searchResultFragment = SearchResultFragment()
+//val mainFragment = MainFragment()
 
 class SecondActivity : AppCompatActivity() {
 
@@ -39,14 +38,18 @@ class SecondActivity : AppCompatActivity() {
         val totalCardList = mutableListOf<CardResponse.UserData.ShowCard>()
     }
 
-    private val userSettingFragment = UserSettingFragment()
+//    private val userSettingFragment = UserSettingFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_second)
-
         val pref = SharedPreferences(this)
         val token = pref.getData()!!
+        val mainFragment = MainFragment()
+        supportFragmentManager.beginTransaction().apply {
+            add(R.id.frame_layout, mainFragment, mainFragment::class.java.name)
+            commit()
+        }
 
         Log.e("UI", "drawler1 $drawerLayout")
         Log.e("UI", "drawler2 ${drawerLayout.navigation}")
@@ -59,75 +62,9 @@ class SecondActivity : AppCompatActivity() {
         val userImage = navigation.getHeaderView(0).findViewById<ImageView>(R.id.img_userPhoto)
         val userEmail = navigation.getHeaderView(0).findViewById<TextView>(R.id.tv_userEmail)
 
-        //以下側邊選單內容
-        val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, toolbar,
-            R.string.drawer_open,
-            R.string.drawer_close
-        )
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-        // Set the toolbar
-        setSupportActionBar(toolbar)
-        //側邊各item的點擊監聽
-        navigation.setNavigationItemSelectedListener {
-//            Toast.makeText(this, it.itemId.toString(), Toast.LENGTH_LONG).show()
-            when (it.itemId) {
-                R.id.action_home -> {
-                    drawerLayout.closeDrawers()
-                    supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.frame_layout, mainFragment, "mainFragment")
-                        commit()
-                    }
-                    //用Handler收drawer,可以smooth一點點
-//                    Handler().postDelayed({ drawerLayout.closeDrawer(GravityCompat.START) }, 200)
-                }
-
-                R.id.action_settings -> {
-                    drawerLayout.closeDrawers()
-                    supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.frame_layout, userSettingFragment, "userSettingFragment")
-                        addToBackStack("mainFragment")
-                        commit()
-                    }
-                }
-
-                R.id.action_help ->{
-                    drawerLayout.closeDrawers()
-                    Toast.makeText(this, "右下+號開始使用吧", Toast.LENGTH_SHORT).show()
-                }
-
-                R.id.action_about ->{
-                    drawerLayout.closeDrawers()
-                    Toast.makeText(this, "android app: Kai \n backend: Gill", Toast.LENGTH_SHORT).show()
-                }
-
-                R.id.btn_logOut -> {
-                    pref.delete()
-                    Toast.makeText(this@SecondActivity, "log out click", Toast.LENGTH_SHORT).show()
-                    this@SecondActivity.finish()
-                    startActivity(Intent(this@SecondActivity, MainActivity::class.java))
-                }
-
-//                R.id.group1_1 -> {
-//                    changeFragment(it.title.toString(), Group1_1Fragment())
-//                    drawer.closeDrawers()
-//                }
-            }
-            true
-        }
-        //以上側邊選單內容
-
-        //登出功能改爲在/menu/drawer的item實作
-        logOut.setOnClickListener {
-            pref.delete()
-            Toast.makeText(this@SecondActivity, "log out click", Toast.LENGTH_SHORT).show()
-            this@SecondActivity.finish()
-            startActivity(Intent(this@SecondActivity, MainActivity::class.java))
-        }
-
-//        if (savedInstanceState == null) {
-        Toast.makeText(this, "TOKEN = $token", Toast.LENGTH_SHORT).show()
+        var arUserName: String = ""
+        var arUserEmail: String = ""
+        var arUserPhotoPath: String = ""
 
         Api.retrofitService.getCard(token)
             .enqueue(object : Callback<CardResponse> {
@@ -144,17 +81,19 @@ class SecondActivity : AppCompatActivity() {
                         totalCardList.clear()
                         userName.text = res?.userData?.username
                         if (res?.userData?.image.toString() != "null") {
-                            val userPhotoPath = "https://storage.googleapis.com/gcs.gill.gq/${res?.userData?.image.toString()}"
-                            Glide.with(this@SecondActivity)
-                                .load(userPhotoPath)
-                                .transform(CircleCrop()).into(userImage)
+                            val userPhotoPath =
+                                if (res?.userData?.image.toString().contains("googleusercontent")) {
+                                    res?.userData?.image.toString() //如果有取得google帳號的圖片路徑,就用這
+                                } else {
+                                    "https://storage.googleapis.com/gcs.gill.gq/${res?.userData?.image.toString()}"
+                                }
+                            Glide.with(this@SecondActivity).load(userPhotoPath).transform(CircleCrop()).into(userImage)
                             userEmail.text = res?.userData?.email
 
-                            userSettingFragment.arguments = Bundle().apply {
-                                putString("userPhotoPath",userPhotoPath)
-                                putString("userEmail",res?.userData?.email)
-                                putString("userName",res?.userData?.username)
-                            }
+                            arUserPhotoPath = userPhotoPath
+                            arUserEmail = res?.userData?.email.toString()
+                            arUserName = res?.userData?.username.toString()
+
                         }
                         res?.userData?.showCards?.forEach { card ->
                             totalCardList.add(card)
@@ -167,11 +106,79 @@ class SecondActivity : AppCompatActivity() {
                     }
                 }
             })
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.frame_layout, mainFragment, "mainFragment")
-            commit()
+
+        //以下側邊選單內容
+        val toggle = ActionBarDrawerToggle(
+            this, drawerLayout, toolbar,
+            R.string.drawer_open,
+            R.string.drawer_close
+        )
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+        // Set the toolbar
+        setSupportActionBar(toolbar)
+        //側邊各item的點擊監聽
+
+        navigation.setNavigationItemSelectedListener {
+//            Toast.makeText(this, it.itemId.toString(), Toast.LENGTH_LONG).show()
+            when (it.itemId) {
+                R.id.action_home -> {
+
+                    drawerLayout.closeDrawers()
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.frame_layout, mainFragment)
+                        commit()
+                    }
+                    //用Handler收drawer,可以smooth一點點
+//                    Handler().postDelayed({ drawerLayout.closeDrawer(GravityCompat.START) }, 200)
+                }
+
+                R.id.action_settings -> {
+                    val userSettingFragment = UserSettingFragment()
+                    userSettingFragment.arguments = Bundle().apply {
+                        putString("userPhotoPath", arUserPhotoPath)
+                        putString("userEmail", arUserEmail)
+                        putString("userName", arUserName)
+                    }
+                    drawerLayout.closeDrawers()
+                    supportFragmentManager.popBackStack(userSettingFragment::class.java.name, POP_BACK_STACK_INCLUSIVE)
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.frame_layout, userSettingFragment, userSettingFragment::class.java.name)
+                        addToBackStack(userSettingFragment::class.java.name)
+                        commit()
+                    }
+                }
+
+                R.id.action_help -> {
+                    drawerLayout.closeDrawers()
+                    Toast.makeText(this, "右下+號開始使用吧", Toast.LENGTH_SHORT).show()
+                }
+
+                R.id.action_about -> {
+                    drawerLayout.closeDrawers()
+                    Toast.makeText(this, "android: Kai \n backend: Gill", Toast.LENGTH_SHORT).show()
+                }
+
+                R.id.btn_logOut -> {
+                    pref.delete()
+                    Toast.makeText(this@SecondActivity, "log out click", Toast.LENGTH_SHORT).show()
+                    this@SecondActivity.finish()
+                    startActivity(Intent(this@SecondActivity, MainActivity::class.java))
+                }
+            }
+            true
         }
-//        } //...savedInstanceState
+        //以上側邊選單內容
+
+        //登出功能改爲在/menu/drawer的item實作
+//        logOut.setOnClickListener {
+//            pref.delete()
+//            Toast.makeText(this@SecondActivity, "log out click", Toast.LENGTH_SHORT).show()
+//            this@SecondActivity.finish()
+//            startActivity(Intent(this@SecondActivity, MainActivity::class.java))
+//        }
+
+        Toast.makeText(this, "TOKEN = $token", Toast.LENGTH_SHORT).show()
 
 
     }
@@ -237,7 +244,7 @@ class SecondActivity : AppCompatActivity() {
                     }
 
                     if (cardResultList.isNotEmpty() || taskResultList.isNotEmpty()) {
-                        searchItem.collapseActionView() //搜尋完後,將toolbar恢復原樣
+//                        searchItem.collapseActionView()
                         val searchResultFragment = SearchResultFragment()
 
                         searchResultFragment.arguments = Bundle().apply {
@@ -246,13 +253,13 @@ class SecondActivity : AppCompatActivity() {
                             putString("queryString", query)
                         }
 
-                        searchView.onActionViewCollapsed()
+                        searchView.onActionViewCollapsed() //搜尋完後,將toolbar恢復原樣
 
-                        supportFragmentManager.popBackStack("MainFragment", POP_BACK_STACK_INCLUSIVE)
+                        supportFragmentManager.popBackStack("searchResultFragment", POP_BACK_STACK_INCLUSIVE)
                         supportFragmentManager.beginTransaction().apply {
                             setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
                             replace(R.id.frame_layout, searchResultFragment, "searchResultFragment")
-                            addToBackStack("MainFragment")
+                            addToBackStack("searchResultFragment")
                             commit()
                         }
 

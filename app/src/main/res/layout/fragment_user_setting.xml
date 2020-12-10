@@ -41,8 +41,6 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="535dp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_settingConfirm"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

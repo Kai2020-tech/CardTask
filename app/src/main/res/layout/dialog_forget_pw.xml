@@ -12,22 +12,23 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="330dp">
+        android:layout_height="158dp">
 
         <EditText
-            android:id="@+id/ed_newTask"
+            android:id="@+id/ed_forgetEmail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:hint="Task Title"
+            android:hint="請輸入 Email"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/btn1"
+            android:id="@+id/btn_forgetEmail_confirm"
+            style="@style/buttonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -37,28 +38,15 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <Button
-            android:id="@+id/btn2"
+            android:id="@+id/btn_forgetEmail_cancel"
+            style="@style/buttonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:text="取消"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn1" />
-
-        <EditText
-            android:id="@+id/ed_taskContext"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:ems="10"
-            android:hint="請輸入內容"
-            android:inputType="none|textImeMultiLine"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ed_newTask" />
+            app:layout_constraintEnd_toStartOf="@+id/btn_forgetEmail_confirm" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

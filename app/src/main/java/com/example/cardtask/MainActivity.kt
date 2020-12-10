@@ -5,9 +5,11 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.example.cardtask.api.*
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -19,13 +21,16 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var pref : SharedPreferences
+
     //google login
-    lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
     private val RC_SIGN_IN = 9001
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,23 +41,23 @@ class MainActivity : AppCompatActivity() {
             10f, 30f, 25f, 32f, 13f, 5f, 18f, 36f, 20f, 30f, 28f, 27f, 29f
         )
 //      檢查之前有無已登入存token
-        val pref = SharedPreferences(this)
+        pref = SharedPreferences(this)
         if (!pref.getData().isNullOrEmpty()) {
             startActivity(Intent(this@MainActivity, SecondActivity::class.java)) //啓動SecondActivity
             finish()    //將自己結束
         }
-        //google login
+//google login
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("609834348003-pbpsen9j6bd3j2eso8g5pbc64c5bnfrn.apps.googleusercontent.com")
+            .requestIdToken("609834348003-pbpsen9j6bd3j2eso8g5pbc64c5bnfrn.apps.googleusercontent.com") //OAUTH用戶端ID(Web client (Auto-created for Google Sign-in))
             .requestEmail()
             .build()
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+        if(pref.getData().isNullOrEmpty()) signOut()
 
         btn_google_login.setOnClickListener {
-            signIn()
+            googleSignIn()
         }
-
 
         btn_register.setOnClickListener {
             btn_cardConfirm.visibility = View.VISIBLE
@@ -149,6 +154,11 @@ class MainActivity : AppCompatActivity() {
                 })
         }
 
+        btn_forgetPassword.setOnClickListener {
+            val emailDialog = LayoutInflater.from(this).inflate(R.layout.dialog_forget_pw,null)
+            val dialogBuild = AlertDialog.Builder(this)
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -183,6 +193,10 @@ class MainActivity : AppCompatActivity() {
             val googleIdToken = account?.idToken ?: ""
             Log.i("Google ID Token", googleIdToken)
 
+            val googleToken = GoogleToken()
+            googleToken.idToken = googleIdToken
+            sendGoogleToken(googleToken)
+
         } catch (e: ApiException) {
             // Sign in was unsuccessful
             Log.e(
@@ -191,8 +205,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //google login
-    private fun signIn() {
+    //Intent google login
+    private fun googleSignIn() {
         val signInIntent = mGoogleSignInClient.signInIntent
         startActivityForResult(
             signInIntent, RC_SIGN_IN
@@ -206,6 +220,27 @@ class MainActivity : AppCompatActivity() {
             }
     }
     //google login
+
+    //
+    private fun sendGoogleToken(googleToken: GoogleToken){
+        Api.retrofitService.googleLogin(googleToken).enqueue(object : Callback<GoogleLoginResponse>{
+            override fun onFailure(call: Call<GoogleLoginResponse>, t: Throwable) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponse(call: Call<GoogleLoginResponse>, response: Response<GoogleLoginResponse>) {
+                if(response.isSuccessful)
+                {
+                    token= response.body()!!.loginData.userToken
+                    pref.saveData(token)
+                    startActivity(
+                        Intent(this@MainActivity, SecondActivity::class.java)
+                    ) //啓動SecondActivity
+                    finish()    //將自己MainActivity結束
+                }
+            }
+        })
+    }
 
     //    按返回鍵判斷是否在register
     override fun onBackPressed() {

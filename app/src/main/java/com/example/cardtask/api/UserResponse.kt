@@ -80,9 +80,35 @@ data class ChangeInfoResponse(
 )
 
 //上傳頭像
-data class UploadUserPhoto(
+data class UploadUserPhotoResponse(
     @SerializedName("error")
     val error: String = "", // upload error
     @SerializedName("status")
     val status: Boolean? = false // false
+)
+
+//google登入
+data class GoogleToken(
+    @SerializedName("idToken")
+    var idToken: String = "" // XXX
+)
+
+data class GoogleLoginResponse(
+    @SerializedName("login_data")
+    val loginData: LoginData = LoginData(),
+    @SerializedName("status")
+    val status: Boolean = false // true
+) {
+    data class LoginData(
+        @SerializedName("userToken")
+        val userToken: String = "" // fQzrAEFjc6brUDY
+    )
+}
+
+//forget pw
+data class ForgetPasswordResponse(
+    @SerializedName("error")
+    val error: String = "", // email false
+    @SerializedName("status")
+    val status: Boolean = false // false
 )

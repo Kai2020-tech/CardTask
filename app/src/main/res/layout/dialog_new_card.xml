@@ -15,7 +15,7 @@
         android:layout_height="130dp">
 
         <EditText
-            android:id="@+id/ed_newTask"
+            android:id="@+id/ed_forgetEmail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -37,7 +37,7 @@
             android:layout_marginEnd="16dp"
             android:text="新增"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ed_newTask" />
+            app:layout_constraintTop_toBottomOf="@+id/ed_forgetEmail" />
 
         <Button
             android:id="@+id/btn_cardCancel"
@@ -48,7 +48,7 @@
             android:layout_marginEnd="16dp"
             android:text="取消"
             app:layout_constraintEnd_toStartOf="@+id/btn_cardConfirm"
-            app:layout_constraintTop_toBottomOf="@+id/ed_newTask" />
+            app:layout_constraintTop_toBottomOf="@+id/ed_forgetEmail" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
