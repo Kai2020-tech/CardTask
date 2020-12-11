@@ -13,14 +13,11 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.example.cardtask.R
+import com.example.cardtask.*
 import com.example.cardtask.api.Api
 import com.example.cardtask.api.ChangeInfoResponse
 import com.example.cardtask.api.UploadUserPhotoResponse
 import com.example.cardtask.api.token
-import com.example.cardtask.createMultipartBody
-import com.example.cardtask.getPhoto
-import com.example.cardtask.showToast
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_user_setting.*
@@ -32,7 +29,7 @@ import retrofit2.Response
 import java.io.File
 
 
-class UserSettingFragment : Fragment() {
+class UserSettingFragment : Fragment(),IPublisher {
 
     lateinit var rootView: View
     private var userPhotoPath = ""
@@ -40,6 +37,8 @@ class UserSettingFragment : Fragment() {
     private var userName = ""
     private var photoFile: File? = null
     private var galleryUri: Uri? = null
+
+    private val subScribers = mutableListOf<IObserver>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +68,7 @@ class UserSettingFragment : Fragment() {
         rootView.tv_userSettingName.text = userName
         rootView.tv_userSettingEmail.text = userEmail
 
-        //上傳圖片
+        //拍照,取得圖片
         rootView.btn_takePhoto.setOnClickListener {
             photoFile = getPhoto(activity)
         }
@@ -126,6 +125,7 @@ class UserSettingFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -159,6 +159,7 @@ class UserSettingFragment : Fragment() {
                 override fun onResponse(call: Call<ChangeInfoResponse>, response: Response<ChangeInfoResponse>) {
                     if (response.isSuccessful) {
                         showToast("暱稱 已修改")
+                        sendUserInfoChanged()
                     } else errorMessage(response)
                 }
             })
@@ -174,6 +175,7 @@ class UserSettingFragment : Fragment() {
                 override fun onResponse(call: Call<ChangeInfoResponse>, response: Response<ChangeInfoResponse>) {
                     if (response.isSuccessful) {
                         showToast("密碼 已修改")
+                        sendUserInfoChanged()
                     } else errorMessage(response)
                 }
             })
@@ -193,6 +195,7 @@ class UserSettingFragment : Fragment() {
                 override fun onResponse(call: Call<ChangeInfoResponse>, response: Response<ChangeInfoResponse>) {
                     if (response.isSuccessful) {
                         showToast("暱稱,密碼 已修改")
+                        sendUserInfoChanged()
                     } else { //error body要以下方式去接
                         errorMessage(response)
                     }
@@ -242,6 +245,7 @@ class UserSettingFragment : Fragment() {
                 override fun onResponse(call: Call<UploadUserPhotoResponse>, response: Response<UploadUserPhotoResponse>) {
                     if (response.isSuccessful) {
                         showToast("圖片已更新")
+                        sendUserInfoChanged()
                     } else {
                         val gson = Gson()
                         val type = object : TypeToken<UploadUserPhotoResponse>() {}.type
@@ -252,6 +256,17 @@ class UserSettingFragment : Fragment() {
             })
     }
 
+    override fun sendUserInfoChanged() {
+        subScribers.forEach { it.update() }
+    }
+
+    override fun addSubscriber(subscriber: IObserver) {
+        subScribers.add(subscriber)
+    }
+
+    override fun removeSubscriber(subscriber: IObserver) {
+        subScribers.remove(subscriber)
+    }
 
 
     //    override fun onBackPressed() {

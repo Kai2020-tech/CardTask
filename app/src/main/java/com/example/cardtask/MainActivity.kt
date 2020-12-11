@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -20,6 +21,7 @@ import com.google.android.gms.tasks.Task
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.dialog_forget_pw.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,7 +29,7 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var pref : SharedPreferences
+    private lateinit var pref: SharedPreferences
 
     //google login
     private lateinit var mGoogleSignInClient: GoogleSignInClient
@@ -53,7 +55,7 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
-        if(pref.getData().isNullOrEmpty()) signOut()
+        if (pref.getData().isNullOrEmpty()) signOut()
 
         btn_google_login.setOnClickListener {
             googleSignIn()
@@ -155,8 +157,28 @@ class MainActivity : AppCompatActivity() {
         }
 
         btn_forgetPassword.setOnClickListener {
-            val emailDialog = LayoutInflater.from(this).inflate(R.layout.dialog_forget_pw,null)
+            val emailDialog = LayoutInflater.from(this).inflate(R.layout.dialog_forget_pw, null)
             val dialogBuild = AlertDialog.Builder(this)
+            val dialog = dialogBuild
+                .setView(emailDialog)
+                .setOnDismissListener {
+                    (emailDialog.parent as ViewGroup).removeView(emailDialog)
+                }
+                .show()
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent) //set dialog background transparent
+
+            emailDialog.btn_forgetPw_cancel.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            emailDialog.btn_forgetPw_confirm.setOnClickListener {
+                val email = emailDialog.ed_forgetPwEmail.text.toString()
+                if(email.isNotEmpty()){
+                    sendEmail(email)
+                }else{
+                    Toast.makeText(this, "請輸入email", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
     }
@@ -221,22 +243,41 @@ class MainActivity : AppCompatActivity() {
     }
     //google login
 
-    //
-    private fun sendGoogleToken(googleToken: GoogleToken){
-        Api.retrofitService.googleLogin(googleToken).enqueue(object : Callback<GoogleLoginResponse>{
+    //將google token傳給後端,再將後端token存下並啓動登入
+    private fun sendGoogleToken(googleToken: GoogleToken) {
+        Api.retrofitService.googleLogin(googleToken).enqueue(object : Callback<GoogleLoginResponse> {
             override fun onFailure(call: Call<GoogleLoginResponse>, t: Throwable) {
                 TODO("Not yet implemented")
             }
 
             override fun onResponse(call: Call<GoogleLoginResponse>, response: Response<GoogleLoginResponse>) {
-                if(response.isSuccessful)
-                {
-                    token= response.body()!!.loginData.userToken
+                if (response.isSuccessful) {
+                    token = response.body()!!.loginData.userToken
                     pref.saveData(token)
                     startActivity(
                         Intent(this@MainActivity, SecondActivity::class.java)
                     ) //啓動SecondActivity
                     finish()    //將自己MainActivity結束
+                }
+            }
+        })
+    }
+
+    //忘記密碼,發送email給後端
+    private fun sendEmail(email: String) {
+        Api.retrofitService.sendEmail(email).enqueue(object : Callback<ForgetPasswordResponse> {
+            override fun onFailure(call: Call<ForgetPasswordResponse>, t: Throwable) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onResponse(call: Call<ForgetPasswordResponse>, response: Response<ForgetPasswordResponse>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(this@MainActivity, "已發送確認信至email", Toast.LENGTH_SHORT).show()
+                } else {
+                    val gson = Gson()
+                    val type = object : TypeToken<ForgetPasswordResponse>() {}.type
+                    var errorResponse: ForgetPasswordResponse = gson.fromJson(response.errorBody()!!.charStream(), type)
+                    Toast.makeText(this@MainActivity, "${errorResponse.error}", Toast.LENGTH_SHORT).show()
                 }
             }
         })

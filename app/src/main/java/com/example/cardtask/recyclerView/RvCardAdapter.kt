@@ -106,15 +106,11 @@ class RvCardAdapter() : RecyclerView.Adapter<RvCardAdapter.ViewHolder>() {
         val timeFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.TAIWAN)
         timeFormatter.timeZone = TimeZone.getTimeZone("GMT")    //加這行才會將絕對時間+8小時
         val updateTime = timeFormatter.parse(currentItem.updatedAt)
-//        holder.cardUpdateTime.text = timeFormatter.parse(currentItem.updatedAt).toString()
         val updateTimeList = timeFormatter.parse(currentItem.updatedAt).toString().split("GMT")
         holder.cardUpdateTime.text = "${updateTimeList[0]} \n GMT${updateTimeList[1]}"
-//        val updateTime = currentItem.updatedAt.split("T", ".")
-//        holder.cardUpdateTime.text = "${updateTime[0]}\n${updateTime[1]}"
 
         holder.cardId.text = currentItem.id.toString()
         holder.groupCard.text = if (rvCardList[position].private) "" else "群組卡片"
-
 
         holder.bind(rvCardList[position].showTasks.toMutableList())
 

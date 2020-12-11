@@ -367,7 +367,7 @@ class MainFragment : Fragment()
         val newCardDialog = LayoutInflater.from(activity).inflate(R.layout.dialog_new_card, null)
         btn_fabCard.setOnClickListener {
             val dialogBuilder = AlertDialog.Builder(activity)
-            val dialog = dialogBuilder.setView(newCardDialog)
+            val dialog = dialogBuilder
                 .setView(newCardDialog)
                 .setOnDismissListener {
                     (newCardDialog.parent as ViewGroup).removeView(newCardDialog)
@@ -379,7 +379,7 @@ class MainFragment : Fragment()
             newCardDialog.btn_cardConfirm.setOnClickListener {
                 val newCard = NewCard()
 
-                newCard.cardName = newCardDialog.ed_forgetEmail.text.toString()
+                newCard.cardName = newCardDialog.ed_forgetPwEmail.text.toString()
 
                 Api.retrofitService.newCard(token, newCard)
                     .enqueue(object : MyCallback<NewCardResponse>() {

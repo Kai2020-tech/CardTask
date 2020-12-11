@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.cardtask.api.Api
 import com.example.cardtask.api.CardResponse
+import com.example.cardtask.api.token
 import com.example.cardtask.fragment.MainFragment
 import com.example.cardtask.fragment.SearchResultFragment
 import com.example.cardtask.fragment.UserSettingFragment
@@ -32,13 +33,19 @@ import retrofit2.Response
 
 //val mainFragment = MainFragment()
 
-class SecondActivity : AppCompatActivity() {
+class SecondActivity : AppCompatActivity(), IObserver {
 
     companion object {
         val totalCardList = mutableListOf<CardResponse.UserData.ShowCard>()
     }
 
-//    private val userSettingFragment = UserSettingFragment()
+    //    private val userSettingFragment = UserSettingFragment()
+    lateinit var userImage: ImageView
+    lateinit var userName: TextView
+    lateinit var userEmail: TextView
+    var arUserPhotoPath: String = ""
+    var arUserName: String = ""
+    var arUserEmail: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,13 +65,9 @@ class SecondActivity : AppCompatActivity() {
 
         /** 這些是drawerLayout nav_header_mail中再下一層的view,要從最外層開始找*/
         val logOut = navigation.getHeaderView(0).findViewById<Button>(R.id.btn_logout)
-        val userName = navigation.getHeaderView(0).findViewById<TextView>(R.id.tv_userName)
-        val userImage = navigation.getHeaderView(0).findViewById<ImageView>(R.id.img_userPhoto)
-        val userEmail = navigation.getHeaderView(0).findViewById<TextView>(R.id.tv_userEmail)
-
-        var arUserName: String = ""
-        var arUserEmail: String = ""
-        var arUserPhotoPath: String = ""
+        userName = navigation.getHeaderView(0).findViewById<TextView>(R.id.tv_userName)
+        userImage = navigation.getHeaderView(0).findViewById<ImageView>(R.id.img_userPhoto)
+        userEmail = navigation.getHeaderView(0).findViewById<TextView>(R.id.tv_userEmail)
 
         Api.retrofitService.getCard(token)
             .enqueue(object : Callback<CardResponse> {
@@ -89,11 +92,9 @@ class SecondActivity : AppCompatActivity() {
                                 }
                             Glide.with(this@SecondActivity).load(userPhotoPath).transform(CircleCrop()).into(userImage)
                             userEmail.text = res?.userData?.email
-
                             arUserPhotoPath = userPhotoPath
                             arUserEmail = res?.userData?.email.toString()
                             arUserName = res?.userData?.username.toString()
-
                         }
                         res?.userData?.showCards?.forEach { card ->
                             totalCardList.add(card)
@@ -117,20 +118,21 @@ class SecondActivity : AppCompatActivity() {
         toggle.syncState()
         // Set the toolbar
         setSupportActionBar(toolbar)
-        //側邊各item的點擊監聽
 
+        //側邊各item的點擊監聽
         navigation.setNavigationItemSelectedListener {
 //            Toast.makeText(this, it.itemId.toString(), Toast.LENGTH_LONG).show()
             when (it.itemId) {
                 R.id.action_home -> {
+                    val mainFragment = MainFragment()
 
-                    drawerLayout.closeDrawers()
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.frame_layout, mainFragment)
                         commit()
                     }
                     //用Handler收drawer,可以smooth一點點
 //                    Handler().postDelayed({ drawerLayout.closeDrawer(GravityCompat.START) }, 200)
+                    drawerLayout.closeDrawers()
                 }
 
                 R.id.action_settings -> {
@@ -140,13 +142,14 @@ class SecondActivity : AppCompatActivity() {
                         putString("userEmail", arUserEmail)
                         putString("userName", arUserName)
                     }
-                    drawerLayout.closeDrawers()
+                    userSettingFragment.addSubscriber(this)
                     supportFragmentManager.popBackStack(userSettingFragment::class.java.name, POP_BACK_STACK_INCLUSIVE)
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.frame_layout, userSettingFragment, userSettingFragment::class.java.name)
                         addToBackStack(userSettingFragment::class.java.name)
                         commit()
                     }
+                    drawerLayout.closeDrawers()
                 }
 
                 R.id.action_help -> {
@@ -289,6 +292,38 @@ class SecondActivity : AppCompatActivity() {
             return true //回傳true表示消耗這個點擊事件,不再往下傳了
         }
         return super.onKeyDown(keyCode, event)
+    }
+
+    override fun update() {
+        Api.retrofitService.getCard(token)
+            .enqueue(object : Callback<CardResponse> {
+                override fun onFailure(call: Call<CardResponse>, t: Throwable) {
+                    Log.e("getCard Failed", t.toString())
+                }
+
+                override fun onResponse(
+                    call: Call<CardResponse>,
+                    response: Response<CardResponse>
+                ) {
+                    val res = response.body()
+                    if (response.isSuccessful) {
+                        if (res?.userData?.image.toString() != "null") {
+                            val userPhotoPath =
+                                if (res?.userData?.image.toString().contains("googleusercontent")) {
+                                    res?.userData?.image.toString() //如果有取得google帳號的圖片路徑,就用這
+                                } else {
+                                    "https://storage.googleapis.com/gcs.gill.gq/${res?.userData?.image.toString()}"
+                                }
+                            Glide.with(this@SecondActivity).load(userPhotoPath).transform(CircleCrop()).into(userImage)
+                            userName.text = res?.userData?.username
+                            userEmail.text = res?.userData?.email
+                            arUserPhotoPath = userPhotoPath
+                            arUserEmail = res?.userData?.email.toString()
+                            arUserName = res?.userData?.username.toString()
+                        }
+                    }
+                }
+            })
     }
 
 //    override fun onBackPressed() {
