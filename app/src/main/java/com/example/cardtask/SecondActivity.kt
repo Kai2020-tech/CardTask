@@ -58,10 +58,10 @@ class SecondActivity : AppCompatActivity(), IObserver {
             commit()
         }
 
-        Log.e("UI", "drawler1 $drawerLayout")
-        Log.e("UI", "drawler2 ${drawerLayout.navigation}")
-        Log.e("UI", "drawler3 ${drawerLayout.navigation.getHeaderView(0)}")
-        Log.e("UI", "drawler4 ${drawerLayout.navigation.getHeaderView(0).btn_logout}")
+        Log.e("UI", "drawer1 $drawerLayout")
+        Log.e("UI", "drawer2 ${drawerLayout.navigation}")
+        Log.e("UI", "drawer3 ${drawerLayout.navigation.getHeaderView(0)}")
+        Log.e("UI", "drawer4 ${drawerLayout.navigation.getHeaderView(0).btn_logout}")
 
         /** 這些是drawerLayout nav_header_mail中再下一層的view,要從最外層開始找*/
         val logOut = navigation.getHeaderView(0).findViewById<Button>(R.id.btn_logout)
