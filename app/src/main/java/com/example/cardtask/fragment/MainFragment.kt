@@ -66,7 +66,7 @@ class MainFragment : Fragment()
 
             cardClickListener = {
                 goToCard(it)
-                showToast("Card item ${it.id}")
+//                showToast("Card item ${it.id}")
             }
 
             cardLongClickListener = {
@@ -76,7 +76,7 @@ class MainFragment : Fragment()
 
             taskClickListener = { showTask ->           //點擊task,到編輯task頁面,add EdTaskFragment
                 Log.i("card fragment", "showTask")
-                showToast("task item $showTask")
+//                showToast("task item $showTask")
                 goToEdTask(showTask)
 
             }
@@ -93,7 +93,7 @@ class MainFragment : Fragment()
         groupCardAdapter = RvCardAdapter()
         groupCardAdapter.cardClickListener = {
             goToCard(it)
-            showToast("Card item ${it.id}")
+//            showToast("Card item ${it.id}")
         }
 
         groupCardAdapter.cardLongClickListener = {
@@ -103,7 +103,7 @@ class MainFragment : Fragment()
 
         groupCardAdapter.taskClickListener = { showTask ->           //點擊task,到編輯task頁面,add EdTaskFragment
             Log.i("card fragment", "showTask")
-            showToast("task item $showTask")
+//            showToast("task item $showTask")
             goToEdTask(showTask)
 
         }

@@ -102,7 +102,7 @@ class CardFragment : Fragment() {
         rootView.ed_rvTask.adapter = taskAdapter    //將task recyclerview接上
             .apply {
                 listener = { showTask ->
-                    showToast("task item $showTask")
+//                    showToast("task item $showTask")
                     goToEdTask(showTask)
                 }
                 longClickListener = { position ->
